@@ -19,7 +19,6 @@ home-assistant.log.fault
 .HA_VERSION
 
 # Storage (contains sensitive tokens)
-.storage/
 
 # Large files
 *.zip
