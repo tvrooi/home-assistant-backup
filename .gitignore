@@ -21,5 +21,10 @@ home-assistant.log.fault
 # Storage (contains sensitive tokens)
 .storage/
 
-# Backups
+# Large files
+*.zip
 *.tar
+*.gz
+
+# Backups
+backups/
