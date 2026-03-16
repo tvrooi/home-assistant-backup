@@ -1,0 +1,25 @@
+# Secrets and sensitive files
+secrets.yaml
+known_devices.yaml
+ip_bans.yaml
+
+# Database files
+home-assistant_v2.db
+home-assistant_v2.db-shm
+home-assistant_v2.db-wal
+
+# Logs
+home-assistant.log
+home-assistant.log.fault
+
+# Cache and runtime
+.cache/
+.cloud/
+.ha_run.lock
+.HA_VERSION
+
+# Storage (contains sensitive tokens)
+.storage/
+
+# Backups
+*.tar
