@@ -1,0 +1,477 @@
+frosted_glass:
+    name: "Frosted Glass"
+    version: "2.27"
+    creator: "Pscharumbel"
+    link: "https://github.com/Clooos/Bubble-Card/discussions/XXXX"
+
+    description: |
+        **Frosted glass design**
+        
+        Choose your preferred color, gradient-style, border-radius, icon-color and icon-background-color, blur- and opacity value. (For Bubble Card border-radius use 32px.)
+        The light effect can be choosen for the card and the icons and you can choose the size and brightness of the effect. I adopted it from the wonderfull visionOS and liquid glass theme. You can even use your own custom box-shadow code.
+        
+        If something doesn’t work, for example the background color or a slider is not shown, then it hasn’t been selected yet or the corresponding control needs to be adjusted. Unfortunately, my default values are not applied automatically the first time a card is activated.
+        If it still doesn’t work, please let me know in the comments.
+        
+        Support 💜 https://buymeacoffee.com/pscharumbel
+        <br><br>
+        <code-block><pre>
+        frosted_glass: 
+            background: YOUR_VALUE
+        </pre></code-block>
+
+    code: |
+        ha-card {
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+          --background-color-2: transparent;
+          --bubble-border-radius: ${this.config.frosted_glass?.border_radius || 32}px;
+          /*--bubble-select-list-item-accent-color: ${this.config.frosted_glass?.dropdown_colored ? `rgb(${this.config.frosted_glass?.background})` : 'rgba(128,128,128,0.2)'} !important; */
+          --bubble-select-list-background-color: ${this.config.frosted_glass?.dropdown_colored ? `rgba(${this.config.frosted_glass?.background},1)` : 'var(--card-background-color)'} !important;
+        }
+        
+        .bubble-icon {
+          opacity: ${this.config.frosted_glass?.main_icon_color_boolean == 'icon_color' ? 1 : '' } !important;
+          color: ${this.config.frosted_glass?.main_icon_color_boolean == 'icon_color' ? `rgb(${this.config.frosted_glass?.main_icon_color})` : '' } !important;
+        }
+        
+        .bubble-container {
+          background: rgba(${this.config.frosted_glass?.background},${this.config.frosted_glass?.opacity || 0});
+          background: ${this.config.frosted_glass?.gradient?.gradient_type == 'gradient_linear' ? `linear-gradient(${this.config.frosted_glass?.gradient?.gradient_rotation || 90}deg, rgba(${this.config.frosted_glass?.background},${this.config.frosted_glass?.opacity || 0}) ${this.config.frosted_glass?.gradient?.gradient_first || 0}%, rgba(${this.config.frosted_glass?.gradient?.gradient_background},${this.config.frosted_glass?.gradient?.gradient_opacity || 0}) ${100-this.config.frosted_glass?.gradient?.gradient_second || 0}%)` : ``};
+          background: ${this.config.frosted_glass?.gradient?.gradient_type == 'gradient_radial' ? `radial-gradient(circle at ${this.config.frosted_glass?.gradient?.gradient_position || "center"}, rgba(${this.config.frosted_glass?.background},${this.config.frosted_glass?.opacity || 0}) ${this.config.frosted_glass?.gradient?.gradient_first || 0}%, rgba(${this.config.frosted_glass?.gradient?.gradient_background},${this.config.frosted_glass?.gradient?.gradient_opacity || 0}) ${100-this.config.frosted_glass?.gradient?.gradient_second || 0}%)` : ``}; 
+          --bubble-secondary-background-color: ${this.config.frosted_glass?.icon_background == 'icon_background' ? `rgb(${this.config.frosted_glass?.icon_background_color})` : ''};
+          --bubble-secondary-background-color: ${this.config.frosted_glass?.icon_background == 'light' ? 'rgba(255,255,255,0.13)' : ''};
+          --bubble-secondary-background-color: ${this.config.frosted_glass?.icon_background == 'dark' ? 'rgba(0,0,0,0.18)' : ''};
+          --bubble-secondary-background-color: ${this.config.frosted_glass?.icon_background == 'none' ? 'transparent' : '' };
+          background-blend-mode: overlay;
+          box-shadow: ${this.config.frosted_glass?.shadow?.main_shadow_style == 'main_shadow_frosted' ? `${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size || 1}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness || 0.4}) inset, -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5 }px ${this.config.frosted_glass?.shadow?.light_size || 1}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1}) inset, 0px ${this.config.frosted_glass?.shadow?.light_size || 1}px ${this.config.frosted_glass?.shadow?.light_size + 1 || 2}px 0px rgba(0, 0, 0,${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1})` : 'none'};
+          box-shadow: ${this.config.frosted_glass?.shadow?.main_shadow_style == 'main_shadow_liquid' ? `3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.30) inset, -2px -2px 0.5px -2px rgba(255, 255, 255, 0.30) inset, 0 0 8px 1px rgba(255, 255, 255, 0.10) inset, 0 0 2px 0 rgba(0, 0, 0, 0.10)` : ''};
+          box-shadow: ${this.config.frosted_glass?.shadow?.main_shadow_style == 'main_shadow_custom' ? `${this.config.frosted_glass?.shadow?.main_shadow_custom_string}` : ''};
+          -webkit-backdrop-filter: blur(${this.config.frosted_glass?.blur || 10}px);
+          backdrop-filter: blur(${this.config.frosted_glass?.blur || 10}px);
+        }
+        
+        .footer-mode:before{
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          pointer-events: none;
+          border-radius: ${this.config.frosted_glass?.border_radius || 32}px !important;
+          box-shadow: ${this.config.frosted_glass?.shadow?.main_shadow_style == 'main_shadow_frosted' ? `${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size || 1}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness || 0.4}) inset, -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5 }px ${this.config.frosted_glass?.shadow?.light_size || 1}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1}) inset, 0px ${this.config.frosted_glass?.shadow?.light_size || 1}px ${this.config.frosted_glass?.shadow?.light_size + 1 || 2}px 0px rgba(0, 0, 0,${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1})` : 'none'};
+          box-shadow: ${this.config.frosted_glass?.shadow?.main_shadow_style == 'main_shadow_liquid' ? `3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.30) inset, -2px -2px 0.5px -2px rgba(255, 255, 255, 0.30) inset, 0 0 8px 1px rgba(255, 255, 255, 0.10) inset, 0 0 2px 0 rgba(0, 0, 0, 0.10)` : ''};
+          box-shadow: ${this.config.frosted_glass?.shadow?.main_shadow_style == 'main_shadow_custom' ? `${this.config.frosted_glass?.shadow?.main_shadow_custom_string}` : ''};
+          -webkit-backdrop-filter: blur(${this.config.frosted_glass?.blur || 10}px);
+          backdrop-filter: blur(${this.config.frosted_glass?.blur || 10}px);
+        }
+        
+        .bubble-icon-container {
+          box-shadow: ${this.config.frosted_glass?.shadow?.icon_shadow_style == 'icon_shadow_frosted' ? `${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness || 0.4}) inset, -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5 }px ${this.config.frosted_glass?.shadow?.light_size || 1}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1}) inset, 0px ${this.config.frosted_glass?.shadow?.light_size || 1}px ${this.config.frosted_glass?.shadow?.light_size + 1 || 2}px 0px rgba(0, 0, 0,${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1})` : 'none'};
+          box-shadow: ${this.config.frosted_glass?.shadow?.icon_shadow_style == 'icon_shadow_liquid' ? `3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.30) inset, -2px -2px 0.5px -2px rgba(255, 255, 255, 0.30) inset, 0 0 8px 1px rgba(255, 255, 255, 0.10) inset, 0 0 2px 0 rgba(0, 0, 0, 0.10)` : ''};
+          box-shadow: ${this.config.frosted_glass?.shadow?.icon_shadow_style == 'icon_shadow_custom' ? `${this.config.frosted_glass?.shadow?.icon_shadow_custom_string}` : ''};
+        }
+        
+        .bubble-sub-button, 
+        .bubble-sub-button-slider, 
+        .bubble-day-chip, 
+        .bubble-media-button, 
+        .bubble-cover-button {
+          box-shadow: ${this.config.frosted_glass?.shadow?.sub_shadow_style == 'sub_shadow_frosted' ? `${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness || 0.4}) inset, -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5 }px ${this.config.frosted_glass?.shadow?.light_size || 1}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1}) inset, 0px ${this.config.frosted_glass?.shadow?.light_size || 1}px ${this.config.frosted_glass?.shadow?.light_size + 1 || 2}px 0px rgba(0, 0, 0,${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1})` : 'none'};
+          box-shadow: ${this.config.frosted_glass?.shadow?.sub_shadow_style == 'sub_shadow_liquid' ? `3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.30) inset, -2px -2px 0.5px -2px rgba(255, 255, 255, 0.30) inset, 0 0 8px 1px rgba(255, 255, 255, 0.10) inset, 0 0 2px 0 rgba(0, 0, 0, 0.10)` : ''};
+          box-shadow: ${this.config.frosted_glass?.shadow?.sub_shadow_style == 'sub_shadow_custom' ? `${this.config.frosted_glass?.shadow?.sub_shadow_custom_string}` : ''};
+        }
+        
+        .bubble-dropdown-arrow {
+          box-shadow: ${
+            this.config.frosted_glass?.specific?.dropdown_arrow 
+              ? this.config.frosted_glass?.shadow?.sub_shadow_style === 'sub_shadow_frosted'
+                ? `${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness || 0.4}) inset, -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5 }px ${this.config.frosted_glass?.shadow?.light_size || 1}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1}) inset, 0px ${this.config.frosted_glass?.shadow?.light_size || 1}px ${this.config.frosted_glass?.shadow?.light_size + 1 || 2}px 0px rgba(0, 0, 0,${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1})`
+                : '' : '' };
+          box-shadow: ${
+            this.config.frosted_glass?.specific?.dropdown_arrow 
+              ? this.config.frosted_glass?.shadow?.sub_shadow_style === 'sub_shadow_liquid'
+                ? `3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.30) inset, -2px -2px 0.5px -2px rgba(255, 255, 255, 0.30) inset, 0 0 8px 1px rgba(255, 255, 255, 0.10) inset, 0 0 2px 0 rgba(0, 0, 0, 0.10)` : '' : '' };
+          box-shadow: ${
+            this.config.frosted_glass?.specific?.dropdown_arrow 
+              ? this.config.frosted_glass?.shadow?.sub_shadow_style === 'sub_shadow_custom'
+                ? `${this.config.frosted_glass?.shadow?.sub_shadow_custom_string}` : '' : '' };
+        }
+        
+        .bubble-range-fill { 
+          opacity: ${this.config.frosted_glass?.slider_opacity || 0} !important;
+        }
+        
+        .bubble-temperature-container {
+          box-shadow: ${
+            this.config.frosted_glass?.specific?.climate_light_effect == 'climate_default_position'
+              ? this.config.frosted_glass?.shadow?.sub_shadow_style === 'sub_shadow_frosted'
+                ? `${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness || 0.4}) inset, -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5 }px ${this.config.frosted_glass?.shadow?.light_size || 1}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1}) inset, 0px ${this.config.frosted_glass?.shadow?.light_size || 1}px ${this.config.frosted_glass?.shadow?.light_size + 1 || 2}px 0px rgba(0, 0, 0,${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1})`
+                : '' : '' };
+          box-shadow: ${
+            this.config.frosted_glass?.specific?.climate_light_effect == 'climate_default_position'
+              ? this.config.frosted_glass?.shadow?.sub_shadow_style === 'sub_shadow_liquid'
+                ? `3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.30) inset, -2px -2px 0.5px -2px rgba(255, 255, 255, 0.30) inset, 0 0 8px 1px rgba(255, 255, 255, 0.10) inset, 0 0 2px 0 rgba(0, 0, 0, 0.10)` : '' : '' };
+          box-shadow: ${
+            this.config.frosted_glass?.specific?.climate_light_effect == 'climate_default_position'
+              ? this.config.frosted_glass?.shadow?.sub_shadow_style === 'sub_shadow_custom'
+                ? `${this.config.frosted_glass?.shadow?.sub_shadow_custom_string}` : '' : '' };
+        }
+        
+        .bubble-climate-temp-display, 
+        .bubble-climate-plus-button,
+        .bubble-climate-minus-button {
+          box-shadow: ${
+            this.config.frosted_glass?.specific?.climate_light_effect == 'climate_bottom_position'
+              ? this.config.frosted_glass?.shadow?.sub_shadow_style === 'sub_shadow_frosted'
+                ? `${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness || 0.4}) inset, -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5 }px ${this.config.frosted_glass?.shadow?.light_size || 1}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1}) inset, 0px ${this.config.frosted_glass?.shadow?.light_size || 1}px ${this.config.frosted_glass?.shadow?.light_size + 1 || 2}px 0px rgba(0, 0, 0,${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1})`
+                : '' : '' };
+          box-shadow: ${
+            this.config.frosted_glass?.specific?.climate_light_effect == 'climate_bottom_position'
+              ? this.config.frosted_glass?.shadow?.sub_shadow_style === 'sub_shadow_liquid'
+                ? `3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.30) inset, -2px -2px 0.5px -2px rgba(255, 255, 255, 0.30) inset, 0 0 8px 1px rgba(255, 255, 255, 0.10) inset, 0 0 2px 0 rgba(0, 0, 0, 0.10)` : '' : '' };
+          box-shadow: ${
+            this.config.frosted_glass?.specific?.climate_light_effect == 'climate_bottom_position'
+              ? this.config.frosted_glass?.shadow?.sub_shadow_style === 'sub_shadow_custom'
+                ? `${this.config.frosted_glass?.shadow?.sub_shadow_custom_string}` : '' : '' };
+        }
+        
+        .bubble-header-container {
+          --bubble-border-radius: ${this.config.frosted_glass?.border_radius || '32'}px !important;
+        }
+        
+        .bubble-pop-up {
+          --bubble-pop-up-border-radius: ${this.config.frosted_glass?.border_radius || '32'}px !important;
+        }
+        
+        .bubble-pop-up-background {
+          box-shadow: ${this.config.frosted_glass?.shadow?.main_shadow_style == 'main_shadow_frosted' ? `${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px ${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness || 0.4}) inset, -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5}px -${this.config.frosted_glass?.shadow?.light_size - 0.5 || 0.5 }px ${this.config.frosted_glass?.shadow?.light_size || 1}px 0px rgba(255, 255, 255, ${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1}) inset, 0px ${this.config.frosted_glass?.shadow?.light_size || 1}px ${this.config.frosted_glass?.shadow?.light_size + 1 || 2}px 0px rgba(0, 0, 0,${this.config.frosted_glass?.shadow?.light_brightness / 4 || 0.1})` : 'none'};
+          box-shadow: ${this.config.frosted_glass?.shadow?.main_shadow_style == 'main_shadow_liquid' ? `3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.30) inset, -2px -2px 0.5px -2px rgba(255, 255, 255, 0.30) inset, 0 0 8px 1px rgba(255, 255, 255, 0.10) inset, 0 0 2px 0 rgba(0, 0, 0, 0.10)` : ''};
+          box-shadow: ${this.config.frosted_glass?.shadow?.main_shadow_style == 'main_shadow_custom' ? `${this.config.frosted_glass?.shadow?.main_shadow_custom_string}` : ''};
+        }
+        
+        /* Tap feedback */
+        
+        ha-ripple,
+        .bubble-feedback-container,
+        .feedback-container,
+        .bubble-icon-feedback-container {
+          ${this.config.frosted_glass?.tap_feedback ? 'display: none' : '' };
+        }
+        
+        .bubble-container,
+        .bubble-sub-button,
+        .bubble-icon-container {
+          ${this.config.frosted_glass?.tap_feedback ? '-webkit-tap-highlight-color: transparent' : '' };
+          ${this.config.frosted_glass?.tap_feedback ? 'transition: transform 0.2s ease' : '' };
+        }
+        
+        .bubble-container:active:not(
+          :has(select:active),
+          :has(ha-select:active),
+          :has(mwc-select:active),
+          :has(.mdc-select:active)
+        ):not(
+          :has(.bubble-sub-button:active),
+          :has(.bubble-icon-container:active)
+        ) {
+          ${this.config.frosted_glass?.tap_feedback ? 'transform: scale(0.9)' : '' };
+        }
+        
+        
+        .bubble-icon-container:active {
+          ${this.config.frosted_glass?.tap_feedback ? 'transform: scale(0.675)' : '' };
+        }
+        
+        .bubble-sub-button:active {
+          ${this.config.frosted_glass?.tap_feedback ? 'transform: scale(0.675)' : '' };
+        }
+
+    editor:
+      - name: background
+        label: Background Color
+        selector:
+          color_rgb: {}
+      - name: main_icon_color_boolean
+        label: Main Icon Color
+        default: icon_theme_color
+        required: true
+        selector:
+          select:
+            options:
+              - label: Theme
+                value: icon_theme_color
+              - label: Choose Color
+                value: icon_color
+            multiple: false
+            custom_value: false
+            mode: list
+      - name: main_icon_color
+        label: Main Icon Color
+        selector:
+          color_rgb: {}
+      - name: icon_background
+        label: Icon Background
+        default: dark
+        required: true
+        selector:
+          select:
+            options:
+              - label: Light
+                value: light
+              - label: Dark
+                value: dark
+              - label: Theme
+                value: theme
+              - label: None
+                value: none
+              - label: Choose Color
+                value: icon_background
+            multiple: false
+            custom_value: false
+            mode: list
+      - name: icon_background_color
+        label: Icon Background Color
+        selector:
+          color_rgb: {}
+      - name: dropdown_colored
+        label: Dropdown Colored
+        selector:
+          boolean: {}
+      - name: tap_feedback
+        label: Tap Feedback (buggy with dropdowns)
+        selector:
+          boolean: {}
+      - name: border_radius
+        label: Border Radius
+        default: 32
+        selector:
+          number:
+            min: 1
+            max: 50
+            step: 1
+            unit_of_measurement: px
+      - name: blur
+        label: Blur
+        default: 10
+        selector:
+          number:
+            min: 1
+            max: 100
+            step: 1
+            unit_of_measurement: px
+      - name: opacity
+        label: Opacity
+        default: 0
+        selector:
+          number:
+            min: 0
+            max: 1
+            step: 0.01
+      - name: slider_opacity
+        label: Slider Opacity
+        default: 1
+        selector:
+          number:
+            min: 0
+            max: 1
+            step: 0.1
+      - type: expandable
+        name: shadow
+        title: Light & Shadow
+        icon: mdi:box-shadow
+        expanded: false
+        schema:
+          - name: main_shadow_style
+            label: Main Card
+            default: main_shadow_frosted
+            required: true
+            selector:
+              select:
+                options:
+                  - label: 'Off'
+                    value: main_shadow_off
+                  - label: Frosted Glass
+                    value: main_shadow_frosted
+                  - label: Liquid Glass
+                    value: main_shadow_liquid
+                  - label: Custom
+                    value: main_shadow_custom
+                multiple: false
+                custom_value: false
+                mode: list
+          - name: main_shadow_custom_string
+            label: Custom Main Box-Shadow
+            type: string
+          - name: icon_shadow_style
+            label: Main Icon
+            default: icon_shadow_frosted
+            required: true
+            selector:
+              select:
+                options:
+                  - label: 'Off'
+                    value: icon_shadow_off
+                  - label: Frosted Glass
+                    value: icon_shadow_frosted
+                  - label: Liquid Glass
+                    value: icon_shadow_liquid
+                  - label: Custom
+                    value: icon_shadow_custom
+                multiple: false
+                custom_value: false
+                mode: list
+          - name: icon_shadow_custom_string
+            label: Custom Main Icon Box-Shadow
+            type: string
+          - name: sub_shadow_style
+            label: Subbutton
+            default: sub_shadow_frosted
+            required: true
+            selector:
+              select:
+                options:
+                  - label: 'Off'
+                    value: sub_shadow_off
+                  - label: Frosted Glass
+                    value: sub_shadow_frosted
+                  - label: Liquid Glass
+                    value: sub_shadow_liquid
+                  - label: Custom
+                    value: sub_shadow_custom
+                multiple: false
+                custom_value: false
+                mode: list
+          - name: sub_shadow_custom_string
+            label: Custom Subbutton Box-Shadow
+            type: string
+          - name: light_size
+            label: Light Size (only frosted)
+            default: 1
+            selector:
+              number:
+                min: 1
+                max: 10
+                step: 0.1
+          - name: light_brightness
+            label: Light Brightness (only frosted)
+            default: 0.4
+            selector:
+              number:
+                min: 0.1
+                max: 1
+                step: 0.1
+      - type: expandable
+        name: gradient
+        title: Gradient
+        icon: mdi:gradient-horizontal
+        expanded: false
+        schema:
+          - name: gradient_background
+            label: Second Background Color
+            selector:
+              color_rgb: {}
+          - name: gradient_type
+            label: Type
+            default: gradient_off
+            required: true
+            selector:
+              select:
+                options:
+                  - label: 'Off'
+                    value: gradient_off
+                  - label: Linear
+                    value: gradient_linear
+                  - label: Radial
+                    value: gradient_radial
+                multiple: false
+                custom_value: false
+                mode: list
+          - name: gradient_first
+            label: First Color
+            default: 0
+            selector:
+              number:
+                min: 0
+                max: 100
+                step: 1
+                unit_of_measurement: '%'
+          - name: gradient_second
+            label: Second Color
+            default: 0
+            selector:
+              number:
+                min: 0
+                max: 100
+                step: 1
+                unit_of_measurement: '%'
+          - name: gradient_opacity
+            label: Gradient Color Opacity
+            default: 1
+            selector:
+              number:
+                min: 0
+                max: 1
+                step: 0.01
+          - name: gradient_rotation
+            label: Rotation (only linear)
+            default: 90
+            selector:
+              number:
+                min: 0
+                max: 360
+                step: 1
+                unit_of_measurement: °
+          - name: gradient_position
+            label: Gradient Position (only radial)
+            default: center
+            required: true
+            selector:
+              select:
+                options:
+                  - label: Center
+                    value: center
+                  - label: Left
+                    value: left
+                  - label: Top Left
+                    value: top left
+                  - label: Top
+                    value: top
+                  - label: Top Right
+                    value: top right
+                  - label: Right
+                    value: right
+                  - label: Bottom right
+                    value: bottom right
+                  - label: Bottom
+                    value: bottom
+                  - label: Bottom Left
+                    value: bottom left
+                multiple: false
+                custom_value: false
+                mode: dropdown
+      - type: expandable
+        name: specific
+        title: Card-Specific Settings
+        icon: mdi:tune
+        expanded: false
+        schema:
+          - name: climate_light_effect
+            label: Climate Card Sub-Buttons Light Effect
+            default: 'off'
+            required: true
+            selector:
+              select:
+                options:
+                  - label: 'Off'
+                    value: climate_light_off
+                  - label: Default
+                    value: climate_default_position
+                  - label: Full Width Buttons
+                    value: climate_bottom_position
+              multiple: false
+              custom_value: false
+              mode: list
+          - name: dropdown_arrow
+            label: Dropdown Arrow Light Effect
+            selector:
+              boolean: {}

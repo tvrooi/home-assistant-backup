@@ -1,0 +1,40 @@
+# Home Assistant Scenes
+# Cleaned up: 2026-02-28
+# Simplified from full state dumps to essential settings only
+
+# Zephyr Bedroom Scenes
+- id: '1772002325951'
+  name: Day Time
+  icon: mdi:weather-sunny
+  entities:
+    light.zephyr_bedroom:
+      state: 'on'
+      brightness_pct: 100
+      color_temp_kelvin: 2702
+
+- id: '1772002498036'
+  name: Dungeon
+  icon: mdi:lightbulb-off-outline
+  entities:
+    light.zephyr_bedroom:
+      state: 'on'
+      brightness_pct: 100
+      rgb_color: [255, 38, 0]
+
+- id: '1772002605085'
+  name: Aqua
+  icon: mdi:water
+  entities:
+    light.zephyr_bedroom:
+      state: 'on'
+      brightness_pct: 255
+      rgb_color: [0, 171, 255]
+
+- id: '1772002807878'
+  name: Sexy Time
+  icon: mdi:heart
+  entities:
+    light.zephyr_bedroom:
+      state: 'on'
+      brightness_pct: 255
+      rgb_color: [255, 0, 146]

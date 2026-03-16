@@ -1,0 +1,30 @@
+{
+  "title": "GE Home (SmartHQ)",
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "region": "Region"
+        }
+      },
+      "reauth": {
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "region": "Region"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Can't connect to SmartHQ",
+      "invalid_auth": "Invalid authentication provided, please check credentials",
+      "unknown": "Unknown error occurred"
+    },    
+    "abort": {
+      "already_configured": "Account already configured!",
+      "reauth_successful": "Re-authentication was successful!"
+    }
+  }
+}

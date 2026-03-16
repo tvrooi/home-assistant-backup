@@ -1,0 +1,178 @@
+---
+selsker-night:
+  # Structure (tapbar at bottom)
+  border-radius: "20px"
+  ha-card-border-radius: "var(--border-radius)"
+  ha-card-border-width: "0px"
+  error-color: "var(--google-red)"
+  warning-color: "var(--google-yellow)"
+  success-color: "var(--google-green)"
+  info-color: "var(--google-blue)"
+  divider-color: "rgba(var(--color-theme),.10)"
+  accent-color: "var(--google-yellow)"
+  state-icon-color: "rgb(var(--color-theme))"
+  ha-dialog-border-radius: "10px"
+  card-mod-theme: "selsker-night"
+  header-height: "calc(var(--header-base-height) + env(safe-area-inset-bottom))"
+  header-base-height: "70px"
+  app-header-selection-bar-color: "transparent"
+
+  # Bubble Card CSS variables – deep atmospheric night
+  bubble-main-background-color: "#0F0F1C"
+  bubble-secondary-background-color: "#17172A"
+  bubble-icon-background-color: "#17172A"
+  bubble-accent-color: "#FF5020"
+  bubble-button-background-color: "#0F0F1C"
+
+  # Move navbar to bottom
+  card-mod-root-yaml: |
+    ha-tabs$: |
+      #tabsContent {
+        width: 97%;
+      }
+    .: |
+      .header {
+        top: auto !important;
+        bottom: 0px !important;
+        box-shadow: var(--footer-shadow);
+        height: var(--header-height) !important;
+      }
+      .toolbar {
+        height: var(--header-base-height) !important;
+        padding-bottom: env(safe-area-inset-bottom) !important;
+      }
+      #view {
+        transform: initial;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100%;
+        padding-top: calc(-1 * var(--header-height)) !important;
+        padding-bottom: var(--header-height) !important;
+      }
+      ha-tabs {
+        --paper-tabs-selection-bar-color: var(--header-tab-indicator-color);
+        --mdc-icon-size: 26px;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 10px;
+        height: 50px !important;
+      }
+      paper-tab[aria-selected=true] {
+        color: var(--header-active-tab-color);
+        background-color: var(--header-active-tab-bg-color);
+      }
+      paper-tab {
+        color: var(--header-all-tabs-color);
+        border-radius: 25px;
+        height: 50px;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+  card-mod-view-yaml: |
+    "*:first-child$": |
+      #columns .column > * {
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-bottom: 5px;
+      }
+
+  modes:
+    light:
+      primary-color: "#FF5020"
+      google-red: "#FF6B57"
+      google-green: "#4ADE80"
+      google-yellow: "#FF5020"
+      google-blue: "#60A5FA"
+      google-violet: "#A78BFA"
+      google-grey: "#8888A0"
+      color-red: "255, 107, 87"
+      color-green: "74, 222, 128"
+      color-yellow: "255, 80, 32"
+      color-blue: "96, 165, 250"
+      color-theme: "200, 200, 220"
+      color-purple: "167, 139, 250"
+      color-grey: "136, 136, 160"
+      color-pink: "236, 72, 153"
+      color-amber: "255, 80, 32"
+      opacity-bg: "0.14"
+      header-active-tab-color: "rgb(var(--color-amber))"
+      header-active-tab-bg-color: "rgba(var(--color-amber), .18)"
+      header-all-tabs-color: "rgba(200, 200, 220, 0.45)"
+      header-tab-indicator-color: "rgba(0,0,0,0)"
+      app-header-text-color: "var(--primary-text-color)"
+      app-header-background-color: "var(--ha-card-background, var(--card-background-color, #0F0F1C))"
+      paper-tabs-selection-bar-color: "var(--primary-text-color)"
+      footer-shadow: "0px -1px 30px 0px rgba(255, 80, 32, 0.18)"
+      card-background-color: "#0F0F1C"
+      primary-background-color: "#070710"
+      secondary-background-color: "#070710"
+      primary-text-color: "#E2E2F5"
+      mdc-theme-on-secondary: "var(--card-background-color)"
+      sidebar-selected-text-color: "rgb(var(--color-amber))"
+      sidebar-selected-icon-color: "rgb(var(--color-amber))"
+      sidebar-text-color: "rgba(200, 200, 220, 0.4)"
+      slider-color: "rgb(var(--color-amber))"
+      slider-bar-color: "rgba(var(--color-amber), 0.3)"
+      box-shadow: "none"
+      mini-media-player-accent-color: "rgb(var(--color-amber))"
+      state-icon-color: "rgb(var(--color-theme))"
+    dark:
+      # Deep atmospheric palette – vivid contrast
+      primary-color: "#FF5020"
+      google-red: "#FF6B57"
+      google-green: "#4ADE80"
+      google-yellow: "#FF5020"
+      google-blue: "#60A5FA"
+      google-violet: "#A78BFA"
+      google-grey: "#8888A0"
+      color-red: "255, 107, 87"
+      color-green: "74, 222, 128"
+      color-yellow: "255, 80, 32"
+      color-blue: "96, 165, 250"
+      color-theme: "200, 200, 220"
+      color-purple: "167, 139, 250"
+      color-grey: "136, 136, 160"
+      color-pink: "236, 72, 153"
+      color-amber: "255, 80, 32"
+      color-background-yellow: "var(--color-yellow)"
+      color-background-blue: "var(--color-blue)"
+      color-background-green: "var(--color-green)"
+      color-background-red: "var(--color-red)"
+      color-background-pink: "var(--color-pink)"
+      color-background-purple: "var(--color-purple)"
+      color-yellow-text: "var(--color-yellow)"
+      color-blue-text: "var(--color-blue)"
+      color-green-text: "var(--color-green)"
+      color-red-text: "var(--color-red)"
+      color-pink-text: "var(--color-pink)"
+      color-purple-text: "var(--color-purple)"
+      opacity-bg: "0.14"
+      # Bottom tap bar – vivid orange glow
+      header-active-tab-color: "rgb(var(--color-amber))"
+      header-active-tab-bg-color: "rgba(var(--color-amber), .18)"
+      header-all-tabs-color: "rgba(200, 200, 220, 0.45)"
+      header-tab-indicator-color: "rgba(0,0,0,0)"
+      app-header-text-color: "var(--primary-text-color)"
+      app-header-background-color: "var(--ha-card-background, var(--card-background-color, #0F0F1C))"
+      paper-tabs-selection-bar-color: "var(--primary-text-color)"
+      footer-shadow: "0px -1px 30px 0px rgba(255, 80, 32, 0.18)"
+      # Very deep cool backgrounds
+      card-background-color: "#0F0F1C"
+      primary-background-color: "#070710"
+      secondary-background-color: "#070710"
+      # Cool bright text
+      primary-text-color: "#E2E2F5"
+      mdc-theme-on-secondary: "var(--card-background-color)"
+      # Sidebar
+      sidebar-selected-text-color: "rgb(var(--color-amber))"
+      sidebar-selected-icon-color: "rgb(var(--color-amber))"
+      sidebar-text-color: "rgba(200, 200, 220, 0.4)"
+      # Slider
+      slider-color: "rgb(var(--color-amber))"
+      slider-bar-color: "rgba(var(--color-amber), 0.3)"
+      # Cards
+      box-shadow: "none"
+      # Media player
+      mini-media-player-accent-color: "rgb(var(--color-amber))"
+      state-icon-color: "rgb(var(--color-theme))"

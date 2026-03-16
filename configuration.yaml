@@ -1,0 +1,173 @@
+# Home Assistant Configuration
+# Cleaned up: 2026-02-28
+
+# Default integrations
+default_config:
+
+# ============================================================================
+# Frontend & Themes
+# ============================================================================
+frontend:
+  themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /hacsfiles/material-you-utilities/material-you-utilities.min.js
+    
+panel_custom:
+  - name: material-you-panel
+    url_path: material-you-configuration
+    sidebar_title: Material You Utilities
+    sidebar_icon: mdi:material-design
+    module_url: /hacsfiles/material-you-utilities/material-you-utilities.min.js
+# ============================================================================
+# Includes
+# ============================================================================
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+template: !include template.yaml
+
+# ============================================================================
+# HTTP Configuration
+# ============================================================================
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.33.0/24
+
+# ============================================================================
+# Climate Control
+# ============================================================================
+smartir:
+
+climate:
+  - platform: smartir
+    name: Living Room AC
+    unique_id: living_ac
+    device_code: 1120
+    controller_data: remote.living
+    temperature_sensor: sensor.living_climate_temperature
+    humidity_sensor: sensor.living_climate_humidity
+
+# ============================================================================
+# Input Helpers - Wake Light Configuration
+# ============================================================================
+input_boolean:
+  tristan_wake_light_enabled:
+    name: Wake-up Lights - Enabled
+    icon: mdi:alarm-check
+
+  # Days of week for wake light schedule
+  tristan_wake_mon:
+    name: Monday
+    icon: mdi:calendar-monday
+  tristan_wake_tue:
+    name: Tuesday
+    icon: mdi:calendar-tuesday
+  tristan_wake_wed:
+    name: Wednesday
+    icon: mdi:calendar-wednesday
+  tristan_wake_thu:
+    name: Thursday
+    icon: mdi:calendar-thursday
+  tristan_wake_fri:
+    name: Friday
+    icon: mdi:calendar-friday
+  tristan_wake_sat:
+    name: Saturday
+    icon: mdi:calendar-saturday
+  tristan_wake_sun:
+    name: Sunday
+    icon: mdi:calendar-sunday
+
+  # UI/Control Toggles
+  backyard_light_manual_off:
+    name: Backyard Light - Manual Off Latch
+    icon: mdi:hand
+    
+  # Controls the collapse/expand toggle on the welcome scenes card
+  welcome_scenes_collapse:
+    name: Welcome Scenes Collapse
+    icon: mdi:chevron-up
+
+  # Required by the ULM card_welcome_scenes topbar chip to function
+  # (referenced internally by card_topbar_welcome template)
+  welcome_scenes_topbar:
+    name: Welcome Scenes Topbar
+    icon: mdi:view-dashboard-outline
+
+  tristan_scene_light_left:
+    name: "Scene – Left Bedside"
+    icon: mdi:floor-lamp-torchiere-variant
+  tristan_scene_light_right:
+    name: "Scene – Right Bedside"
+    icon: mdi:floor-lamp-torchiere-variant
+  tristan_scene_light_desk:
+    name: "Scene – Brass Diva"
+    icon: mdi:desk-lamp-on
+  tristan_scene_dynamic:
+    name: "Scene – Dynamic"
+    icon: mdi:shimmer
+
+# ============================================================================
+# Input Helpers - Time Settings
+# ============================================================================
+input_datetime:
+  tristan_wake_time:
+    name: Tristan - Wake Time
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+
+# ============================================================================
+# Input Helpers - Numeric Values
+# ============================================================================
+input_number:
+  tristan_wake_light_offset:
+    name: Tristan - Wake Light Offset (minutes)
+    min: 0
+    max: 60
+    step: 5
+    mode: slider
+    icon: mdi:weather-sunset-up
+    unit_of_measurement: min
+    
+  tristan_scene_brightness:
+    name: "Scene – Brightness"
+    icon: mdi:brightness-6
+    min: 0
+    max: 100
+    step: 1
+    initial: 80
+    mode: slider
+  tristan_scene_interval:
+    name: "Scene – Interval"
+    icon: mdi:timer-outline
+    min: 1
+    max: 60
+    step: 1
+    initial: 20
+    unit_of_measurement: "s"
+    mode: slider
+  tristan_scene_transition:
+    name: "Scene – Transition"
+    icon: mdi:transition
+    min: 0
+    max: 5
+    step: 0.5
+    initial: 1
+    unit_of_measurement: "s"
+    mode: slider
+    
+    
+input_text:
+  tristan_active_scene:
+    name: "Tristan Active Scene"
+    icon: mdi:shimmer
+    max: 100
+    initial: ""
+    
+camera:
+  - platform: generic
+    name: iMac Webcam
+    stream_source: rtsp://192.168.86.157:8554/imac_cam
+    rtsp_transport: tcp

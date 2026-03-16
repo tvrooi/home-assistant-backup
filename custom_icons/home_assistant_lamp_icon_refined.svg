@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <g stroke="#111111" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer smoked-glass cylinder -->
+    <rect x="185" y="58" width="142" height="354" rx="34" stroke-width="16"/>
+    <ellipse cx="256" cy="70" rx="63" ry="18" stroke-width="10"/>
+
+    <!-- Inner illuminated crystal column, extended to touch base -->
+    <rect x="220" y="132" width="72" height="238" rx="18" stroke-width="10"/>
+    <ellipse cx="256" cy="132" rx="34" ry="12" stroke-width="8"/>
+
+    <!-- Top reflected light curves, fully visible -->
+    <path d="M214 116 A42 14 0 0 1 298 116" stroke-width="7"/>
+    <path d="M208 101 A48 15 0 0 1 304 101" stroke-width="7"/>
+    <path d="M203 86 A53 16 0 0 1 309 86" stroke-width="7"/>
+
+    <!-- Fluted inner texture -->
+    <line x1="233" y1="149" x2="233" y2="360" stroke-width="4"/>
+    <line x1="245" y1="149" x2="245" y2="360" stroke-width="4"/>
+    <line x1="256" y1="149" x2="256" y2="360" stroke-width="4"/>
+    <line x1="267" y1="149" x2="267" y2="360" stroke-width="4"/>
+    <line x1="279" y1="149" x2="279" y2="360" stroke-width="4"/>
+
+    <!-- Lower internal reflections -->
+    <path d="M228 334 A28 10 0 0 0 284 334" stroke-width="5"/>
+    <path d="M225 351 A31 11 0 0 0 287 351" stroke-width="5"/>
+
+    <!-- Polished metal base: same width as outer tube -->
+    <path d="M185 370
+             C185 370 189 478 189 478
+             C189 490 198 498 210 498
+             L302 498
+             C314 498 323 490 323 478
+             C323 478 327 370 327 370" stroke-width="16"/>
+  </g>
+</svg>

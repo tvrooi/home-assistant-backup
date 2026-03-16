@@ -1,0 +1,1316 @@
+light_color_temp_helper_2:
+  alias: Light Color Temp Helper
+  description: Switch color temperature of light in steps
+  mode: queued
+  fields:
+    target_light:
+      name: Light
+      description: Light entity to adjust
+      required: true
+      selector:
+        entity:
+          filter:
+            domain: light
+    min_color_temp:
+      name: Minimum Color Temperature (K)
+      default: 2200
+      required: true
+      selector:
+        number:
+          mode: box
+          min: 1000
+          max: 10000
+          step: 50
+    max_color_temp:
+      name: Maximum Color Temperature (K)
+      default: 4000
+      required: true
+      selector:
+        number:
+          mode: box
+          min: 1000
+          max: 10000
+          step: 50
+    color_temp_step:
+      name: Color Temperature Step (K)
+      default: 300
+      required: true
+      selector:
+        number:
+          mode: box
+          min: 50
+          max: 2000
+          step: 50
+    mode:
+      name: Mode
+      description: up/down/cycle
+      default: cycle
+      required: true
+      selector:
+        select:
+          options:
+          - up
+          - down
+          - cycle
+  sequence:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{% set modes = state_attr(target_light, ''supported_color_modes'')
+          %} {{ modes is not none and ''color_temp'' in modes }}'
+      sequence:
+      - target:
+          entity_id: '{{ target_light }}'
+        data:
+          color_temp_kelvin: "{% set current = state_attr(target_light, 'color_temp_kelvin')
+            %} {% set min_k = (min_color_temp | int) %} {% set max_k = (max_color_temp
+            | int) %} {% set step = (color_temp_step | int) %} {% set m = (mode |
+            string) %} {% if current is none %}\n  {{ max_k }}\n{% else %}\n  {% if
+            m == 'cycle' and (current | int) >= max_k %}\n    {{ min_k }}\n  {% else
+            %}\n    {% set delta = step if m != 'down' else -step %}\n    {% set new_value
+            = (current | int) + delta %}\n    {{ [ [new_value, max_k] | min, min_k
+            ] | max }}\n  {% endif %}\n{% endif %}"
+        action: light.turn_on
+    default: []
+juno_tv_toggle_mute:
+  alias: Juno Bedroom - TV Mute Toggle
+  icon: mdi:television-play
+  mode: single
+  sequence:
+  - service: media_player.volume_mute
+    target:
+      entity_id: media_player.juno_s_bedroom_tv
+    data:
+      is_volume_muted: '{{ not state_attr(''media_player.juno_s_bedroom_tv'', ''is_volume_muted'')
+        }}'
+sonos_mute_toggle_living_room:
+  alias: Sonos - Mute Toggle
+  icon: mdi:music-off
+  mode: single
+  sequence:
+  - target:
+      entity_id: media_player.sonos
+    data:
+      is_volume_muted: '{{ not state_attr(''media_player.sonos'', ''is_volume_muted'')
+        }}'
+    action: media_player.volume_mute
+lr_fan_off:
+  alias: Living Room Fan - Off
+  icon: mdi:fan-off
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: living_room_fan
+      command: power_off
+lr_fan_breeze:
+  alias: Living Room Fan - Natural Breeze
+  icon: mdi:weather-windy
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: living_room_fan
+      command: breeze
+lr_fan_speed_1:
+  alias: Living Room Fan - Speed 1
+  icon: mdi:fan-speed-1
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: living_room_fan
+      command: speed_1
+lr_fan_speed_2:
+  alias: Living Room Fan - Speed 2
+  icon: mdi:fan-speed-2
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: living_room_fan
+      command: speed_2
+lr_fan_speed_3:
+  alias: Living Room Fan - Speed 3
+  icon: mdi:fan-speed-3
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: living_room_fan
+      command: speed_3
+lr_fan_speed_4:
+  alias: Living Room Fan - Speed 4
+  icon: mdi:fan
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: living_room_fan
+      command: speed_4
+lr_fan_speed_5:
+  alias: Living Room Fan - Speed 5
+  icon: mdi:fan-alert
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: living_room_fan
+      command: speed_5
+dr_fan_off:
+  alias: Dining Room Fan - Off
+  icon: mdi:fan-off
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: dining_room_fan
+      command: power_off
+dr_fan_breeze:
+  alias: Dining Room Fan - Natural Breeze
+  icon: mdi:weather-windy
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: dining_room_fan
+      command: breeze
+dr_fan_speed_1:
+  alias: Dining Room Fan - Speed 1
+  icon: mdi:fan-speed-1
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: dining_room_fan
+      command: speed_1
+dr_fan_speed_2:
+  alias: Dining Room Fan - Speed 2
+  icon: mdi:fan-speed-2
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: dining_room_fan
+      command: speed_2
+dr_fan_speed_3:
+  alias: Dining Room Fan - Speed 3
+  icon: mdi:fan-speed-3
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: dining_room_fan
+      command: speed_3
+dr_fan_speed_4:
+  alias: Dining Room Fan - Speed 4
+  icon: mdi:fan
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: dining_room_fan
+      command: speed_4
+dr_fan_speed_5:
+  alias: Dining Room Fan - Speed 5
+  icon: mdi:fan-alert
+  mode: single
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.living
+    data:
+      device: dining_room_fan
+      command: speed_5
+dr_fan_on_level_1:
+  alias: Dining Room Fan - On Level 1
+  icon: mdi:fan-speed-1
+  mode: single
+  sequence:
+  - service: script.dr_fan_speed_1
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.dining_room_fan_speed
+    data:
+      value: 1
+dr_fan_off_and_sync:
+  alias: Dining Room Fan - Off (Sync)
+  icon: mdi:fan-off
+  mode: single
+  sequence:
+  - service: script.dr_fan_off
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.dining_room_fan_speed
+    data:
+      value: 0
+front_sprinkler_start:
+  alias: Front Sprinkler - Start (Minutes Helper)
+  icon: mdi:sprinkler
+  mode: restart
+  sequence:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.front_water_valve
+  - service: timer.start
+    target:
+      entity_id: timer.front_sprinkler
+    data:
+      duration: 00:{{ states('input_number.front_sprinkler_minutes') | int }}:00
+  - service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.front_sprinkler_last_ran
+    data:
+      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+front_sprinkler_stop:
+  alias: Front Sprinkler - Stop
+  icon: mdi:sprinkler-variant
+  mode: single
+  sequence:
+  - service: timer.cancel
+    target:
+      entity_id: timer.front_sprinkler
+  - service: switch.turn_off
+    target:
+      entity_id: switch.front_water_valve
+front_sprinkler_start_5:
+  alias: Front Sprinkler - Start 5 Minutes
+  icon: mdi:sprinkler
+  mode: restart
+  sequence:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.front_sprinkler_minutes
+    data:
+      value: 5
+  - service: script.front_sprinkler_start
+front_sprinkler_start_10:
+  alias: Front Sprinkler - Start 10 Minutes
+  icon: mdi:sprinkler
+  mode: restart
+  sequence:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.front_sprinkler_minutes
+    data:
+      value: 10
+  - service: script.front_sprinkler_start
+front_sprinkler_start_15:
+  alias: Front Sprinkler - Start 15 Minutes
+  icon: mdi:sprinkler
+  mode: restart
+  sequence:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.front_sprinkler_minutes
+    data:
+      value: 15
+  - service: script.front_sprinkler_start
+front_sprinkler_start_20:
+  alias: Front Sprinkler - Start 20 Minutes
+  icon: mdi:sprinkler
+  mode: restart
+  sequence:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.front_sprinkler_minutes
+    data:
+      value: 20
+  - service: script.front_sprinkler_start
+tristan_dynamic_scene_start:
+  alias: Tristan Bedroom - Dynamic Scene Start
+  icon: mdi:motion-play
+  mode: restart
+  description: Animated color-changing lights
+  sequence:
+  - target:
+      entity_id: input_boolean.tristan_dynamic_scene
+    action: input_boolean.turn_on
+  - target:
+      entity_id:
+      - light.tristan_left_bedside
+      - light.tristan_desk_colour
+    data:
+      brightness_pct: 25
+      transition: 5
+    action: light.turn_on
+  - variables:
+      hue: 0
+  - repeat:
+      while:
+      - condition: state
+        entity_id: input_boolean.tristan_dynamic_scene
+        state: 'on'
+      sequence:
+      - target:
+          entity_id: light.tristan_right_bedside
+        data:
+          hs_color:
+          - '{{ hue }}'
+          - 85
+          brightness_pct: 55
+          transition: 20
+        action: light.turn_on
+      - delay: 00:00:20
+      - variables:
+          hue: '{{ (hue + 18) % 360 }}'
+tristan_dynamic_scene_stop:
+  alias: Tristan Bedroom - Dynamic Scene Stop
+  icon: mdi:motion-pause
+  mode: single
+  sequence:
+  - target:
+      entity_id: input_boolean.tristan_dynamic_scene
+    action: input_boolean.turn_off
+tristan_desk_apply_preset:
+  alias: Tristan Bedroom - Desk Lamp Apply Preset
+  icon: mdi:desk-lamp
+  mode: queued
+  fields:
+    rgb:
+      description: RGB list like [255,0,0]
+      example: '[244, 67, 54]'
+    kelvin:
+      description: Color temperature in kelvin
+      example: '2700'
+    brightness:
+      description: Brightness percentage
+      example: '50'
+  sequence:
+  - variables:
+      b: '{{ state_attr(''light.tristan_right_bedside'',''brightness'') | int(0) }}'
+      brightness_final: '{{ brightness | default(b if b > 0 else 128) | int }}'
+  - choose:
+    - conditions: '{{ rgb is defined and rgb is not none }}'
+      sequence:
+      - target:
+          entity_id: light.tristan_right_bedside
+        data:
+          rgb_color: '{{ rgb }}'
+          brightness: '{{ brightness_final | int }}'
+        action: light.turn_on
+    - conditions: '{{ kelvin is defined and kelvin is not none }}'
+      sequence:
+      - target:
+          entity_id: light.tristan_right_bedside
+        data:
+          color_temp_kelvin: '{{ kelvin | int }}'
+          brightness: '{{ brightness_final | int }}'
+        action: light.turn_on
+apply_living_room_light_profile:
+  alias: Living Room - Light Apply Profile
+  icon: mdi:lightbulb-group
+  mode: restart
+  fields:
+    profile:
+      description: Preset name (nightlight/relax/day/focus)
+      example: relax
+  sequence:
+  - variables:
+      p: '{{ (profile | default(''relax'')) | lower }}'
+      presets:
+        nightlight:
+          brightness_pct: 8
+          kelvin: 2200
+        relax:
+          brightness_pct: 45
+          kelvin: 2700
+        day:
+          brightness_pct: 70
+          kelvin: 3500
+        focus:
+          brightness_pct: 100
+          kelvin: 5000
+      s: '{{ presets.get(p, presets.relax) }}'
+  - target:
+      entity_id: light.living_room_lights
+    data:
+      transition: 0.6
+      brightness_pct: '{{ s.brightness_pct }}'
+      color_temp_kelvin: '{{ s.kelvin }}'
+    action: light.turn_on
+juno_scene_energize:
+  alias: Juno Bedroom - Scene Energize
+  icon: mdi:lightning-bolt
+  mode: single
+  sequence:
+  - service: light.turn_on
+    target:
+      entity_id: light.juno_room
+    data:
+      brightness_pct: 100
+      color_temp_kelvin: 4000
+      transition: 2
+juno_scene_read:
+  alias: Juno Bedroom - Scene Read
+  icon: mdi:book-open-variant
+  mode: single
+  sequence:
+  - service: light.turn_on
+    target:
+      entity_id: light.juno_room
+    data:
+      brightness_pct: 75
+      color_temp_kelvin: 3500
+      transition: 2
+juno_scene_relax:
+  alias: Juno Bedroom - Scene Relax
+  icon: mdi:weather-sunset
+  mode: single
+  sequence:
+  - service: light.turn_on
+    target:
+      entity_id: light.juno_room
+    data:
+      brightness_pct: 45
+      color_temp_kelvin: 2700
+      transition: 3
+juno_scene_nightlight:
+  alias: Juno Bedroom - Scene Nightlight
+  icon: mdi:moon-waning-crescent
+  mode: single
+  sequence:
+  - service: light.turn_on
+    target:
+      entity_id: light.juno_room
+    data:
+      brightness_pct: 8
+      color_temp_kelvin: 2300
+      transition: 4
+juno_scene_city_of_love:
+  alias: Juno Bedroom - Scene City of Love
+  icon: mdi:heart-outline
+  mode: single
+  sequence:
+  - action: light.turn_on
+    target:
+      entity_id: light.juno_room
+    data:
+      brightness_pct: 35
+      color_temp_kelvin: 2202
+      transition: 4
+juno_dynamic_scene_start:
+  alias: Juno Bedroom - Dynamic Scene Start
+  icon: mdi:motion-play
+  mode: restart
+  description: Animated lighting cycle
+  sequence:
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.juno_dynamic_scene
+  - repeat:
+      while:
+      - condition: state
+        entity_id: input_boolean.juno_dynamic_scene
+        state: 'on'
+      sequence:
+      - service: light.turn_on
+        target:
+          entity_id: light.juno_room
+        data:
+          brightness_pct: 45
+          color_temp_kelvin: 2300
+          transition: 6
+      - delay: 00:00:25
+      - service: light.turn_on
+        target:
+          entity_id: light.juno_room
+        data:
+          brightness_pct: 70
+          color_temp_kelvin: 3200
+          transition: 6
+      - delay: 00:00:25
+      - service: light.turn_on
+        target:
+          entity_id: light.juno_room
+        data:
+          brightness_pct: 85
+          color_temp_kelvin: 4000
+          transition: 6
+      - delay: 00:00:25
+      - service: light.turn_on
+        target:
+          entity_id: light.juno_room
+        data:
+          brightness_pct: 35
+          color_temp_kelvin: 2202
+          transition: 8
+      - delay: 00:00:25
+juno_dynamic_scene_stop:
+  alias: Juno Bedroom - Dynamic Scene Stop
+  icon: mdi:motion-pause
+  mode: single
+  sequence:
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.juno_dynamic_scene
+juno_adaptive_enable:
+  alias: Juno Bedroom - Adaptive Lighting Enable
+  icon: mdi:theme-light-dark
+  mode: single
+  sequence:
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.juno_adaptive
+  - service: script.juno_adaptive_apply_now
+juno_adaptive_disable:
+  alias: Juno Bedroom - Adaptive Lighting Disable
+  icon: mdi:theme-light-dark
+  mode: single
+  sequence:
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.juno_adaptive
+juno_adaptive_apply_now:
+  alias: Juno Bedroom - Adaptive Lighting Apply Now
+  icon: mdi:refresh
+  mode: restart
+  sequence:
+  - condition: state
+    entity_id: input_boolean.juno_adaptive
+    state: 'on'
+  - choose:
+    - conditions:
+      - condition: time
+        after: 07:00:00
+        before: '12:00:00'
+      sequence:
+      - service: light.turn_on
+        target:
+          entity_id: light.juno_room
+        data:
+          brightness_pct: 85
+          color_temp_kelvin: 3800
+          transition: 3
+    - conditions:
+      - condition: time
+        after: '12:00:00'
+        before: '17:30:00'
+      sequence:
+      - service: light.turn_on
+        target:
+          entity_id: light.juno_room
+        data:
+          brightness_pct: 100
+          color_temp_kelvin: 4000
+          transition: 3
+    - conditions:
+      - condition: time
+        after: '17:30:00'
+        before: '21:30:00'
+      sequence:
+      - service: light.turn_on
+        target:
+          entity_id: light.juno_room
+        data:
+          brightness_pct: 60
+          color_temp_kelvin: 3000
+          transition: 4
+    - conditions:
+      - condition: time
+        after: '21:30:00'
+        before: '23:59:59'
+      sequence:
+      - service: light.turn_on
+        target:
+          entity_id: light.juno_room
+        data:
+          brightness_pct: 35
+          color_temp_kelvin: 2400
+          transition: 6
+    default:
+    - service: light.turn_on
+      target:
+        entity_id: light.juno_room
+      data:
+        brightness_pct: 15
+        color_temp_kelvin: 2202
+        transition: 8
+zephyr_bedroom_apply_preset:
+  alias: Zephyr Bedroom - Apply Preset
+  icon: mdi:desk-lamp
+  mode: queued
+  fields:
+    rgb:
+      description: RGB list like [255,0,0]
+      example: '[244, 67, 54]'
+    kelvin:
+      description: Color temperature in kelvin
+      example: '2700'
+  sequence:
+  - variables:
+      b: '{{ state_attr(''light.zephyr_bedroom'',''brightness'') | int(0) }}'
+      brightness_final: '{{ b if b > 0 else 128 }}'
+  - choose:
+    - conditions: '{{ rgb is defined and rgb is not none }}'
+      sequence:
+      - target:
+          entity_id: light.zephyr_bedroom
+        data:
+          rgb_color: '{{ rgb }}'
+          brightness: '{{ brightness_final | int }}'
+        action: light.turn_on
+    - conditions: '{{ kelvin is defined and kelvin is not none }}'
+      sequence:
+      - target:
+          entity_id: light.zephyr_bedroom
+        data:
+          color_temp_kelvin: '{{ kelvin | int }}'
+          brightness: '{{ brightness_final | int }}'
+        action: light.turn_on
+zephyr_dynamic_scene_start:
+  alias: Zephyr Bedroom - Dynamic Scene Start
+  icon: mdi:motion-play
+  mode: restart
+  description: Animated RGB color cycling
+  sequence:
+  - target:
+      entity_id: input_boolean.zephyr_dynamic_scene
+    action: input_boolean.turn_on
+  - repeat:
+      while:
+      - condition: state
+        entity_id: input_boolean.zephyr_dynamic_scene
+        state: 'on'
+      sequence:
+      - target:
+          entity_id: light.zephyr_bedroom
+        data:
+          rgb_color:
+          - 255
+          - 140
+          - 0
+          brightness: 180
+          transition: 5
+        action: light.turn_on
+      - delay: 00:00:10
+      - target:
+          entity_id: light.zephyr_bedroom
+        data:
+          rgb_color:
+          - 0
+          - 120
+          - 255
+          brightness: 180
+          transition: 5
+        action: light.turn_on
+      - delay: 00:00:10
+      - target:
+          entity_id: light.zephyr_bedroom
+        data:
+          rgb_color:
+          - 180
+          - 0
+          - 255
+          brightness: 180
+          transition: 5
+        action: light.turn_on
+      - delay: 00:00:10
+zephyr_dynamic_scene_stop:
+  alias: Zephyr Bedroom - Dynamic Scene Stop
+  icon: mdi:motion-pause
+  mode: single
+  sequence:
+  - target:
+      entity_id: input_boolean.zephyr_dynamic_scene
+    action: input_boolean.turn_off
+living_room_scene_energize:
+  alias: Living Room Scene - Energize
+  description: Bright, cool white lighting for focus and energy
+  sequence:
+  - target:
+      entity_id:
+      - light.living_room_lights
+      - light.dragon
+      - light.living_orb
+    data:
+      brightness: 255
+      kelvin: 5000
+    action: light.turn_on
+living_room_scene_movie:
+  alias: Living Room Scene - Movie
+  description: Dim warm lighting for movies, also dims hallway
+  sequence:
+  - target:
+      entity_id:
+      - light.living_room_lights
+      - light.dragon
+      - light.living_orb
+    data:
+      brightness: 51
+      kelvin: 3000
+    action: light.turn_on
+  - target:
+      entity_id: light.hallway_pendant
+    data:
+      brightness: 26
+    action: light.turn_on
+living_room_scene_relax:
+  alias: Living Room Scene - Relax
+  description: Warm, dimmed lighting for relaxation
+  sequence:
+  - target:
+      entity_id:
+      - light.living_room_lights
+      - light.dragon
+      - light.living_orb
+    data:
+      brightness: 102
+      kelvin: 3000
+    action: light.turn_on
+dining_room_scene_energize:
+  alias: Dining Room Scene - Energize
+  description: Bright, cool white lighting
+  sequence:
+  - target:
+      entity_id:
+      - light.dining_room_floor_lamp
+    data:
+      brightness: 255
+      kelvin: 5000
+    action: light.turn_on
+dining_room_scene_dinner:
+  alias: Dining Room Scene - Dinner
+  description: Warm, medium brightness for dining
+  sequence:
+  - target:
+      entity_id:
+      - light.dining_room_floor_lamp
+    data:
+      brightness: 179
+      kelvin: 3500
+    action: light.turn_on
+dining_room_scene_relax:
+  alias: Dining Room Scene - Relax
+  description: Dim, warm lighting for relaxation
+  sequence:
+  - target:
+      entity_id:
+      - light.dining_room_floor_lamp
+    data:
+      brightness: 102
+      kelvin: 3000
+    action: light.turn_on
+dining_room_scene_movie:
+  alias: Dining Room Scene - Movie
+  description: Very dim, warm lighting for movies
+  sequence:
+  - target:
+      entity_id:
+      - light.dining_room_floor_lamp
+    data:
+      brightness: 26
+      kelvin: 3000
+    action: light.turn_on
+zephyr_fan_toggle_light:
+  alias: Zephyr Fan - Toggle Light
+  icon: mdi:lightbulb
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: toggle_light
+    action: remote.send_command
+zephyr_fan_brightness_up:
+  alias: Zephyr Fan - Brightness Up
+  icon: mdi:brightness-7
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: brightness_up
+    action: remote.send_command
+zephyr_fan_brightness_down:
+  alias: Zephyr Fan - Brightness Down
+  icon: mdi:brightness-3
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: brightness_down
+    action: remote.send_command
+zephyr_fan_power_off:
+  alias: Zephyr Fan - Off
+  icon: mdi:fan-off
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: power_off
+    action: remote.send_command
+zephyr_fan_breeze:
+  alias: Zephyr Fan - Natural Breeze
+  icon: mdi:weather-windy
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: breeze
+    action: remote.send_command
+zephyr_fan_forward_reverse:
+  alias: Zephyr Fan - Forward/Reverse
+  icon: mdi:rotate-3d-variant
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: forward_reverse
+    action: remote.send_command
+zephyr_fan_speed_1:
+  alias: Zephyr Fan - Speed 1
+  icon: mdi:fan-speed-1
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: speed_1
+    action: remote.send_command
+zephyr_fan_speed_2:
+  alias: Zephyr Fan - Speed 2
+  icon: mdi:fan-speed-2
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: speed_2
+    action: remote.send_command
+zephyr_fan_speed_3:
+  alias: Zephyr Fan - Speed 3
+  icon: mdi:fan-speed-3
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: speed_3
+    action: remote.send_command
+zephyr_fan_speed_4:
+  alias: Zephyr Fan - Speed 4
+  icon: mdi:fan-speed-4
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: speed_4
+    action: remote.send_command
+zephyr_fan_speed_5:
+  alias: Zephyr Fan - Speed 5
+  icon: mdi:fan-speed-5
+  mode: single
+  sequence:
+  - target:
+      entity_id: remote.living
+    data:
+      device: zephyr_fan
+      command: speed_5
+    action: remote.send_command
+dashboard_apply_theme:
+  alias: Dashboard Apply Theme
+  description: Reads the current theme selection and dark mode toggle, applies the
+    matching HA theme
+  mode: restart
+  sequence:
+  - variables:
+      theme_name: '{% set m = {''Day'': ''selsker-day'', ''Night'': ''selsker-night'',
+        ''Graphite'': ''Graphite Auto'', ''Liquid Glass'': ''Liquid Glass'', ''Material
+        You'': ''Material You'', ''Frosted Glass'': ''Frosted Glass'', ''Frosted Glass
+        Dark'': ''Frosted Glass Dark'', ''Frosted Glass Dark Lite'': ''Frosted Glass
+        Dark Lite'', ''Frosted Glass Light'': ''Frosted Glass Light'', ''Frosted Glass
+        Light Lite'': ''Frosted Glass Light Lite'', ''Frosted Glass Lite'': ''Frosted
+        Glass Lite'', ''Minimalist Desktop'': ''minimalist-desktop'', ''Minimalist
+        Mobile'': ''minimalist-mobile'', ''Minimalist iOS'': ''minimalist-ios-tapbar'',
+        ''Minimalist Tapbar'': ''minimalist-mobile-tapbar'', ''Bubble 2026'': ''Bubble
+        2026'', ''Bubble BFG'': ''Bubble 2026 BFG'', ''Bubble Dracula'': ''Bubble
+        Dracula'', ''Bubble Nord'': ''Bubble Nord'', ''Bubble Catppuccin'': ''Bubble
+        Catppuccin Macchiato'', ''Bubble Tokyo Night'': ''Bubble Tokyo Night'', ''Bubble
+        Gruvbox'': ''Bubble Gruvbox'', ''Bubble Cyberpunk'': ''Bubble Cyberpunk'',
+        ''Bubble Minimal'': ''Bubble Minimal'', ''Bubble Latte'': ''Bubble Latte'',
+        ''Dubble Dracula'': ''Dubble Dracula'', ''Dubble Nord'': ''Dubble Nord''}
+        %}
+
+        {{ m.get(states(''input_select.dashboard_theme''), ''selsker-day'') }}'
+      theme_mode: '{{ ''dark'' if is_state(''input_boolean.dashboard_dark_mode'',
+        ''on'') else ''light'' }}'
+  - action: frontend.set_theme
+    data:
+      name: '{{ theme_name }}'
+      mode: '{{ theme_mode }}'
+tristan_bedroom_honolulu_sunset:
+  alias: Tristan Bedroom - Honolulu Beach Sunset (60 min)
+  description: Smooth 1-hour color transition through coral, orange, pink, and purple
+    sunset colors
+  mode: single
+  sequence:
+  - target:
+      entity_id:
+      - light.tristan_right_bedside
+      - light.tristan_desk_colour
+    data:
+      hs_color:
+      - 28
+      - 100
+      brightness: 254
+      transition: 480
+    action: light.turn_on
+  - action: light.turn_on
+    target:
+      entity_id: light.tristan_left_bedside
+    data:
+      color_temp_kelvin: 2000
+      brightness: 254
+      transition: 480
+  - delay:
+      seconds: 480
+  - target:
+      entity_id:
+      - light.tristan_right_bedside
+      - light.tristan_desk_colour
+    data:
+      hs_color:
+      - 35
+      - 95
+      transition: 480
+    action: light.turn_on
+  - delay:
+      seconds: 480
+  - target:
+      entity_id:
+      - light.tristan_right_bedside
+      - light.tristan_desk_colour
+    data:
+      hs_color:
+      - 30
+      - 90
+      transition: 480
+    action: light.turn_on
+  - delay:
+      seconds: 480
+  - target:
+      entity_id:
+      - light.tristan_right_bedside
+      - light.tristan_desk_colour
+    data:
+      hs_color:
+      - 8
+      - 95
+      transition: 480
+    action: light.turn_on
+  - action: light.turn_on
+    target:
+      entity_id: light.tristan_left_bedside
+    data:
+      color_temp_kelvin: 2200
+      transition: 480
+  - delay:
+      seconds: 480
+  - target:
+      entity_id:
+      - light.tristan_right_bedside
+      - light.tristan_desk_colour
+    data:
+      hs_color:
+      - 355
+      - 85
+      transition: 480
+    action: light.turn_on
+  - delay:
+      seconds: 480
+  - target:
+      entity_id:
+      - light.tristan_right_bedside
+      - light.tristan_desk_colour
+    data:
+      hs_color:
+      - 310
+      - 90
+      transition: 480
+    action: light.turn_on
+  - delay:
+      seconds: 480
+  - target:
+      entity_id:
+      - light.tristan_right_bedside
+      - light.tristan_desk_colour
+    data:
+      hs_color:
+      - 280
+      - 95
+      transition: 480
+    action: light.turn_on
+  - action: light.turn_on
+    target:
+      entity_id: light.tristan_left_bedside
+    data:
+      color_temp_kelvin: 2500
+      transition: 480
+  - delay:
+      seconds: 480
+  - target:
+      entity_id:
+      - light.tristan_right_bedside
+      - light.tristan_desk_colour
+    data:
+      hs_color:
+      - 270
+      - 100
+      brightness: 200
+      transition: 480
+    action: light.turn_on
+  - delay:
+      seconds: 480
+frontyard_open_popup:
+  alias: Frontyard Open Popup
+  mode: restart
+  sequence:
+  - action: camera.turn_on
+    target:
+      entity_id: camera.facing_front_door
+  - delay:
+      milliseconds: 500
+  - action: browser_mod.navigate
+    data:
+      path: '#frontyard'
+  description: ''
+tristan_bedtime_reading_scene:
+  alias: Tristan Bedtime Reading Scene
+  mode: single
+  sequence:
+  - data:
+      preset_id: e03267e7-9914-4f47-97fe-63c0bd317fe7
+      targets:
+        entity_id: light.tristan_right_bedside
+      shuffle: false
+      smart_shuffle: false
+    action: scene_presets.apply_preset
+  - data:
+      preset_id: b6f58e22-677f-4670-8677-3dea4ac60383
+      targets:
+        entity_id:
+        - light.tristan_left_bedside
+        - light.tristan_desk_colour
+      shuffle: false
+      smart_shuffle: false
+    action: scene_presets.apply_preset
+  - target:
+      entity_id: switch.tristan_plug
+    action: switch.turn_off
+  description: ''
+apply_tristan_room_scene:
+  alias: Apply Tristan Room Scene
+  mode: restart
+  fields:
+    preset_id:
+      description: Scene Preset ID
+    scene_name:
+      description: Human-readable scene name
+  sequence:
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.tristan_active_scene
+    data:
+      value: '{{ scene_name }}'
+  - if:
+    - condition: state
+      entity_id: input_boolean.tristan_scene_dynamic
+      state: 'on'
+    then:
+    - if:
+      - condition: state
+        entity_id: input_boolean.tristan_scene_light_left
+        state: 'on'
+      then:
+      - action: scene_presets.start_dynamic_scene
+        data:
+          preset_id: '{{ preset_id }}'
+          targets:
+            entity_id: light.tristan_left_bedside
+          transition: '{{ states(''input_number.tristan_scene_transition'') | int
+            }}'
+          interval: '{{ states(''input_number.tristan_scene_interval'') | int }}'
+    - if:
+      - condition: state
+        entity_id: input_boolean.tristan_scene_light_right
+        state: 'on'
+      then:
+      - action: scene_presets.start_dynamic_scene
+        data:
+          preset_id: '{{ preset_id }}'
+          targets:
+            entity_id: light.tristan_right_bedside
+          transition: '{{ states(''input_number.tristan_scene_transition'') | int
+            }}'
+          interval: '{{ states(''input_number.tristan_scene_interval'') | int }}'
+    - if:
+      - condition: state
+        entity_id: input_boolean.tristan_scene_light_desk
+        state: 'on'
+      then:
+      - action: scene_presets.start_dynamic_scene
+        data:
+          preset_id: '{{ preset_id }}'
+          targets:
+            entity_id: light.tristan_desk_colour
+          transition: '{{ states(''input_number.tristan_scene_transition'') | int
+            }}'
+          interval: '{{ states(''input_number.tristan_scene_interval'') | int }}'
+    else:
+    - if:
+      - condition: state
+        entity_id: input_boolean.tristan_scene_light_left
+        state: 'on'
+      then:
+      - action: scene_presets.apply_preset
+        data:
+          preset_id: '{{ preset_id }}'
+          targets:
+            entity_id: light.tristan_left_bedside
+          shuffle: false
+          smart_shuffle: false
+      - if:
+        - condition: state
+          entity_id: input_boolean.tristan_scene_custom_brightness
+          state: 'on'
+        then:
+        - action: light.turn_on
+          target:
+            entity_id: light.tristan_left_bedside
+          data:
+            brightness_pct: '{{ states(''input_number.tristan_scene_brightness'')
+              | int }}'
+            transition: '{{ states(''input_number.tristan_scene_transition'') | float
+              }}'
+    - if:
+      - condition: state
+        entity_id: input_boolean.tristan_scene_light_right
+        state: 'on'
+      then:
+      - action: scene_presets.apply_preset
+        data:
+          preset_id: '{{ preset_id }}'
+          targets:
+            entity_id: light.tristan_right_bedside
+          shuffle: false
+          smart_shuffle: false
+      - if:
+        - condition: state
+          entity_id: input_boolean.tristan_scene_custom_brightness
+          state: 'on'
+        then:
+        - action: light.turn_on
+          target:
+            entity_id: light.tristan_right_bedside
+          data:
+            brightness_pct: '{{ states(''input_number.tristan_scene_brightness'')
+              | int }}'
+            transition: '{{ states(''input_number.tristan_scene_transition'') | float
+              }}'
+    - if:
+      - condition: state
+        entity_id: input_boolean.tristan_scene_light_desk
+        state: 'on'
+      then:
+      - action: scene_presets.apply_preset
+        data:
+          preset_id: '{{ preset_id }}'
+          targets:
+            entity_id: light.tristan_desk_colour
+          shuffle: false
+          smart_shuffle: false
+      - if:
+        - condition: state
+          entity_id: input_boolean.tristan_scene_custom_brightness
+          state: 'on'
+        then:
+        - action: light.turn_on
+          target:
+            entity_id: light.tristan_desk_colour
+          data:
+            brightness_pct: '{{ states(''input_number.tristan_scene_brightness'')
+              | int }}'
+            transition: '{{ states(''input_number.tristan_scene_transition'') | float
+              }}'
+    - if:
+      - condition: state
+        entity_id: input_boolean.tristan_scene_custom_brightness
+        state: 'off'
+      then:
+      - delay:
+          seconds: '{{ [states(''input_number.tristan_scene_transition'') | float
+            | round(0) | int + 1, 2] | max }}'
+      - variables:
+          synced_brightness: "{% if is_state('input_boolean.tristan_scene_light_left',
+            'on') and state_attr('light.tristan_left_bedside', 'brightness') %}\n
+            \ {{ (state_attr('light.tristan_left_bedside', 'brightness') / 255 * 100)
+            | round(0) | int }}\n{% elif is_state('input_boolean.tristan_scene_light_right',
+            'on') and state_attr('light.tristan_right_bedside', 'brightness') %}\n
+            \ {{ (state_attr('light.tristan_right_bedside', 'brightness') / 255 *
+            100) | round(0) | int }}\n{% elif is_state('input_boolean.tristan_scene_light_desk',
+            'on') and state_attr('light.tristan_desk_colour', 'brightness') %}\n  {{
+            (state_attr('light.tristan_desk_colour', 'brightness') / 255 * 100) |
+            round(0) | int }}\n{% else %}\n  50\n{% endif %}\n"
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.tristan_scene_brightness
+        data:
+          value: '{{ synced_brightness }}'
+stop_tristan_room_scene:
+  alias: Stop Tristan Room Scene
+  icon: mdi:stop-circle-outline
+  sequence:
+  - service: script.turn_off
+    target:
+      entity_id: script.apply_tristan_room_scene
+  - service: input_text.set_value
+    target:
+      entity_id: input_text.tristan_active_scene
+    data:
+      value: ''
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.tristan_scene_dynamic
+  mode: single

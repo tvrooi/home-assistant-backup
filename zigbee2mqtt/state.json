@@ -1,0 +1,490 @@
+{
+    "0x00158d008c7c3f97": {
+        "contact": false,
+        "linkquality": 75,
+        "voltage": 3055,
+        "battery": 100,
+        "device_temperature": 26,
+        "power_outage_count": 13,
+        "trigger_count": 0
+    },
+    "0xa4c138bb16ffdaad": {
+        "presence": false,
+        "motion_detection_sensitivity": 12,
+        "battery": 75,
+        "fading_time": 60,
+        "illuminance_interval": 1,
+        "illuminance": 0,
+        "temperature": 22.1,
+        "humidity": 70,
+        "indicator": "OFF",
+        "temperature_calibration": 0,
+        "humidity_calibration": 0,
+        "temperature_unit": "celsius",
+        "linkquality": 66
+    },
+    "0xc4d8c8fffe49bdd2": {
+        "current_device_status": "normal_state",
+        "auto_close_when_water_shortage": "DISABLE",
+        "state": "OFF",
+        "battery": 100,
+        "update": {
+            "state": "idle",
+            "installed_version": 4100,
+            "latest_version": 4100,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/Sonoff/zbswv_v1.0.4.ota",
+            "latest_release_notes": null
+        },
+        "flow": 0,
+        "linkquality": 78
+    },
+    "0xa4c1385451a39d3c": {
+        "voltage": 2800,
+        "battery": 100,
+        "contact": false,
+        "tamper": false,
+        "battery_low": false,
+        "linkquality": 21
+    },
+    "0xa4c1383a6aaf3761": {
+        "vibration": false,
+        "battery": 100,
+        "sensitivity": 1,
+        "linkquality": 48
+    },
+    "0x180df9fffe0e58ec": {
+        "state": "OFF",
+        "power_on_behavior": "off",
+        "update": {
+            "state": "idle",
+            "installed_version": 33816613,
+            "latest_version": 33816613,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/IKEA/tretakt_smart_plug_soc-0x1100-2.4.25-prod.ota.ota.signed",
+            "latest_release_notes": "https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html"
+        },
+        "led_enable": "TRUE",
+        "linkquality": 81
+    },
+    "0x20a716fffea47f07": {
+        "state": "ON",
+        "power_on_behavior": "off",
+        "linkquality": 60,
+        "update": {
+            "state": "idle",
+            "installed_version": 33816613,
+            "latest_version": 33816613,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/IKEA/tretakt_smart_plug_soc-0x1100-2.4.25-prod.ota.ota.signed",
+            "latest_release_notes": "https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html"
+        }
+    },
+    "0x20a716fffe4c3eb8": {
+        "state": "OFF",
+        "power_on_behavior": "off",
+        "update": {
+            "state": "idle",
+            "installed_version": 33816613,
+            "latest_version": 33816613,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/IKEA/tretakt_smart_plug_soc-0x1100-2.4.25-prod.ota.ota.signed",
+            "latest_release_notes": "https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html"
+        },
+        "linkquality": 120
+    },
+    "0xc09b9efffe0be1d2": {
+        "state": "ON",
+        "power_on_behavior": "off",
+        "linkquality": 51,
+        "update": {
+            "state": "idle",
+            "installed_version": 33816613,
+            "latest_version": 33816613,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/IKEA/tretakt_smart_plug_soc-0x1100-2.4.25-prod.ota.ota.signed",
+            "latest_release_notes": "https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html"
+        }
+    },
+    "0xbc8d7efffec29a5d": {
+        "brightness": 127,
+        "state": "OFF",
+        "color_mode": "color_temp",
+        "color_temp": 454,
+        "color_temp_startup": 454,
+        "update": {
+            "state": "idle",
+            "installed_version": 65554,
+            "latest_version": 65554,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/IKEA/zingo-lds-bulb-hwpwmcs-ws_release_prod_v65554_5d50205c-63c3-426d-bfba-4839c4b55bba.ota",
+            "latest_release_notes": "https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html"
+        },
+        "linkquality": 39
+    },
+    "0xbc8d7efffeaee2b6": {
+        "state": "OFF",
+        "linkquality": 87,
+        "update": {
+            "state": "idle",
+            "installed_version": 65554,
+            "latest_version": 65554,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/IKEA/zingo-lds-bulb-hwpwmcs-ws_release_prod_v65554_5d50205c-63c3-426d-bfba-4839c4b55bba.ota",
+            "latest_release_notes": "https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html"
+        },
+        "brightness": 254,
+        "color_temp": 370,
+        "color_mode": "color_temp",
+        "level_config": {
+            "on_level": "previous"
+        }
+    },
+    "0xa4c138303ad6ffff": {
+        "battery": 100,
+        "voltage": 3100,
+        "temperature": 23.6,
+        "humidity": 66,
+        "linkquality": 117
+    },
+    "0xa4c138303ad2ffff": {
+        "temperature": 21.3,
+        "humidity": 74,
+        "linkquality": 36,
+        "battery": 100,
+        "voltage": 3100
+    },
+    "0x94a081fffe6ce7a7": {
+        "update": {
+            "state": "idle",
+            "installed_version": 16842784,
+            "latest_version": 16842784,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/IKEA/zingo-kt-bulb-hwpwmcs-ws_release_prod_v16842784_32dc5ff1-4fa4-4960-a847-5e548a81047c.ota",
+            "latest_release_notes": "https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html"
+        },
+        "linkquality": 39,
+        "state": "ON",
+        "brightness": 102,
+        "color_temp": 370,
+        "color_mode": "color_temp",
+        "level_config": {
+            "on_level": "previous"
+        }
+    },
+    "0xa4c1383041abffff": {
+        "temperature": 21.2,
+        "humidity": 72,
+        "linkquality": 120,
+        "battery": 100,
+        "voltage": 3000
+    },
+    "0xa4c138304083ffff": {
+        "temperature": 22.7,
+        "humidity": 66,
+        "linkquality": 48,
+        "battery": 100,
+        "voltage": 3000
+    },
+    "0xa4c138304f17ffff": {
+        "temperature": 21.3,
+        "humidity": 68,
+        "linkquality": 90,
+        "battery": 100,
+        "voltage": 3100
+    },
+    "0xa4c13891c62f96d2": {
+        "voltage": 3000,
+        "battery": 100,
+        "contact": true,
+        "tamper": false,
+        "battery_low": false,
+        "linkquality": 123
+    },
+    "0xa4c138c47cdb6de3": {
+        "voltage": 2900,
+        "battery": 100,
+        "contact": true,
+        "tamper": false,
+        "battery_low": false,
+        "linkquality": 36
+    },
+    "0xa4c138d5e2e5849b": {
+        "voltage": 3000,
+        "battery": 100,
+        "contact": false,
+        "tamper": false,
+        "battery_low": false,
+        "linkquality": 87
+    },
+    "0xa4c1384b7c526cf2": {
+        "contact": false,
+        "tamper": false,
+        "battery_low": false,
+        "voltage": 3000,
+        "battery": 100,
+        "linkquality": 81
+    },
+    "0xa4c138303786ffff": {
+        "temperature": 21.5,
+        "humidity": 66,
+        "battery": 100,
+        "voltage": 3100,
+        "linkquality": 96
+    },
+    "0xa4c138fbf5eab5f5": {
+        "battery": 100,
+        "occupancy": false,
+        "illuminance": 0,
+        "illuminance_interval": 1,
+        "keep_time": "10",
+        "sensitivity": "high",
+        "linkquality": 87
+    },
+    "0xa4c1389bcbee127d": {
+        "battery": 100,
+        "temperature": 20.5,
+        "humidity": 84,
+        "soil_moisture": 19,
+        "temperature_unit": "celsius",
+        "linkquality": 81,
+        "temperature_calibration": 0,
+        "humidity_calibration": 0,
+        "temperature_sampling": 30,
+        "dry": true,
+        "soil_warning": 20,
+        "soil_calibration": 0,
+        "soil_sampling": 30
+    },
+    "0xa4c1383507302be1": {
+        "voltage": 3000,
+        "battery": 100,
+        "contact": false,
+        "tamper": false,
+        "battery_low": false,
+        "linkquality": 81
+    },
+    "0xa4c13858c92671d0": {
+        "soil_moisture": 62,
+        "illuminance": 0,
+        "temperature": 18.7,
+        "soil_sampling": 600,
+        "humidity_calibration": 0,
+        "temperature_calibration": 0,
+        "linkquality": 111,
+        "water_warning": "none",
+        "humidity": 94,
+        "battery_state": "high",
+        "soil_calibration": 0,
+        "illuminance_calibration": 0,
+        "soil_warning": 30
+    },
+    "0x1035970000831bfe": {
+        "battery": 100,
+        "linkquality": 120
+    },
+    "0x103597000083874d": {
+        "linkquality": 120,
+        "battery": 100
+    },
+    "0x001788010d9383a1": {
+        "linkquality": 66,
+        "state": "ON",
+        "color_mode": "xy",
+        "color_temp": 448,
+        "brightness": 142,
+        "color": {
+            "x": 0.5019,
+            "y": 0.4152
+        },
+        "update": {
+            "state": "idle",
+            "installed_version": 16787202,
+            "latest_version": 16787202,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/Hue/100B-0114-01002702-ConfLightBLE-Lamps-EFR32MG21.zigbee",
+            "latest_release_notes": null
+        }
+    },
+    "0x0017880109082084": {
+        "state": "OFF",
+        "linkquality": 78,
+        "update": {
+            "state": "idle",
+            "installed_version": 16788226,
+            "latest_version": 16788226,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/Hue/100B-0112-01002B02-ConfLightBLE-Lamps-EFR32MG13.zigbee",
+            "latest_release_notes": null
+        },
+        "brightness": 127
+    },
+    "0x0017880108ec681b": {
+        "state": "ON",
+        "linkquality": 117,
+        "update": {
+            "state": "idle",
+            "installed_version": 16788226,
+            "latest_version": 16788226,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/Hue/100B-0112-01002B02-ConfLightBLE-Lamps-EFR32MG13.zigbee",
+            "latest_release_notes": null
+        },
+        "brightness": 254,
+        "power_on_behavior": "previous"
+    },
+    "0xc02cedfffe9b54d6": {
+        "state": "ON",
+        "update": {
+            "state": "idle",
+            "installed_version": 65554,
+            "latest_version": 65554,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/IKEA/zingo-lds-bulb-hwpwmcs-ws_release_prod_v65554_5d50205c-63c3-426d-bfba-4839c4b55bba.ota",
+            "latest_release_notes": "https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html"
+        },
+        "linkquality": 111,
+        "brightness": 102,
+        "color_mode": "color_temp",
+        "color_temp": 454,
+        "level_config": {
+            "on_level": "previous"
+        }
+    },
+    "0x0017880103524a4e": {
+        "brightness": 142,
+        "state": "ON",
+        "linkquality": 69,
+        "color_mode": "color_temp",
+        "color_temp": 350
+    },
+    "0x8c73dafffe6a102c": {
+        "occupancy": true,
+        "illumination": "bright",
+        "update": {
+            "state": "idle",
+            "installed_version": 4102,
+            "latest_version": 4101,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/Sonoff/snzb-06p_v1.0.5.ota",
+            "latest_release_notes": null
+        },
+        "occupancy_sensitivity": "high",
+        "linkquality": 93
+    },
+    "0x58263afffe562e1a": {
+        "update": {
+            "state": "idle",
+            "installed_version": 16842784,
+            "latest_version": 16842784,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/IKEA/zingo-kt-bulb-hwpwmcs-ws_release_prod_v16842784_32dc5ff1-4fa4-4960-a847-5e548a81047c.ota",
+            "latest_release_notes": "https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html"
+        },
+        "state": "ON",
+        "color_mode": "color_temp",
+        "color_temp": 454,
+        "brightness": 254,
+        "linkquality": 57
+    },
+    "0x58263afffe625549": {
+        "update": {
+            "state": "idle",
+            "installed_version": 16777284,
+            "latest_version": 16777284,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/IKEA/zingo_cws-0x2805-1.0.44-prod.ota.ota.signed",
+            "latest_release_notes": "https://ww8.ikea.com/ikeahomesmart/releasenotes/releasenotes.html"
+        },
+        "state": "ON",
+        "color_mode": "color_temp",
+        "color_temp": 250,
+        "linkquality": 51,
+        "color": {
+            "x": 0.3804,
+            "y": 0.3767
+        },
+        "brightness": 254
+    },
+    "0x001788010e2ac178": {
+        "battery": 100,
+        "update": {
+            "state": "idle",
+            "installed_version": 33576193,
+            "latest_version": 33574183,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/Hue/100B-0119-02004D27-Switch-EFR32MG22.zigbee",
+            "latest_release_notes": null
+        },
+        "linkquality": 78
+    },
+    "0xa4c1381258bfffff": {
+        "temperature": 20.3,
+        "humidity": 76,
+        "linkquality": 51,
+        "battery": 100,
+        "voltage": 3100
+    },
+    "0xa4c138232bcccdb5": {
+        "battery": 100,
+        "temperature": 20.4,
+        "humidity": 95,
+        "temperature_unit": "celsius",
+        "temperature_calibration": 0,
+        "humidity_calibration": 0,
+        "soil_moisture": 8,
+        "temperature_sampling": 30,
+        "dry": true,
+        "soil_warning": 20,
+        "soil_calibration": 0,
+        "soil_sampling": 30,
+        "linkquality": 93
+    },
+    "0xa4c138845611b90d": {
+        "battery": 30,
+        "dry": false,
+        "temperature": 21,
+        "humidity": 89,
+        "temperature_unit": "celsius",
+        "temperature_calibration": 0,
+        "humidity_calibration": 0,
+        "soil_moisture": 26,
+        "temperature_sampling": 30,
+        "soil_warning": 20,
+        "soil_calibration": 0,
+        "soil_sampling": 30,
+        "linkquality": 75
+    },
+    "0xa4c138c028882f7d": {
+        "battery": 50,
+        "soil_moisture": 13,
+        "temperature_unit": "celsius",
+        "temperature": 22.4,
+        "humidity": 91,
+        "linkquality": 120,
+        "dry": true,
+        "temperature_calibration": 0,
+        "humidity_calibration": 0,
+        "temperature_sampling": 30,
+        "soil_warning": 20,
+        "soil_calibration": 0,
+        "soil_sampling": 30
+    },
+    "0x001788010d3ff408": {
+        "brightness": 142,
+        "state": "ON",
+        "update": {
+            "state": "idle",
+            "installed_version": 16787202,
+            "latest_version": 16787202,
+            "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/Hue/100B-0114-01002702-ConfLightBLE-Lamps-EFR32MG21.zigbee",
+            "latest_release_notes": null
+        },
+        "color_mode": "xy",
+        "color_temp": 448,
+        "color": {
+            "x": 0.5019,
+            "y": 0.4152
+        },
+        "linkquality": 105
+    },
+    "0xa4c1380acab499de": {
+        "soil_moisture": 66,
+        "battery": 100,
+        "temperature": 20.2,
+        "humidity": 94,
+        "linkquality": 105,
+        "temperature_unit": "celsius",
+        "temperature_calibration": 0,
+        "humidity_calibration": 0,
+        "temperature_sampling": 30,
+        "dry": false,
+        "soil_warning": 20,
+        "soil_calibration": 0,
+        "soil_sampling": 30
+    }
+}

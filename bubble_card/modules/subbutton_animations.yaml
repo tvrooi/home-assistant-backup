@@ -1,0 +1,189 @@
+subbutton_animations:
+  name: Subbutton Animations
+  version: "v1.0"
+  creator: "ddewar"
+  link: "https://github.com/ddewar/"
+  description: This module adds the ability to customize animations for subbutton icons.
+
+  unsupported:
+    - horizontal-buttons-stack
+    - separator
+    - pop-up
+    - empty-column
+
+  editor:
+    - type: expandable
+      name: subbutton1
+      title: "Subbutton 1"
+      icon: "mdi:list-box-outline"
+      schema:
+        - name: animation
+          label: "Animation"
+          selector:
+            select:
+              multiple: false
+              mode: dropdown
+              options:
+                - label: Spin
+                  value: "spin"
+                - label: Sound
+                  value: "sound"
+                - label: Roam
+                  value: "roam"
+                - label: Bounce
+                  value: "bounce"
+        - name: condition
+          label: "Annimation is always visible if no condition is defined. Otherwise, it will be shown when ALL below conditions are fulfilled."
+          selector:
+            condition: {}
+
+    - type: expandable
+      name: subbutton2
+      title: "Subbutton 2"
+      icon: "mdi:list-box-outline"
+      schema:
+        - name: animation
+          label: "Animation"
+          selector:
+            select:
+              multiple: false
+              mode: dropdown
+              options:
+                - label: Spin
+                  value: "spin"
+                - label: Sound
+                  value: "sound"
+                - label: Roam
+                  value: "roam"
+                - label: Bounce
+                  value: "bounce"
+        - name: condition
+          label: "Annimation is always visible if no condition is defined. Otherwise, it will be shown when ALL below conditions are fulfilled."
+          selector:
+            condition: {}
+
+    - type: expandable
+      name: subbutton3
+      title: "Subbutton 3"
+      icon: "mdi:list-box-outline"
+      schema:
+        - name: animation
+          label: "Animation"
+          selector:
+            select:
+              multiple: false
+              mode: dropdown
+              options:
+                - label: Spin
+                  value: "spin"
+                - label: Sound
+                  value: "sound"
+                - label: Roam
+                  value: "roam"
+                - label: Bounce
+                  value: "bounce"
+        - name: condition
+          label: "Annimation is always visible if no condition is defined. Otherwise, it will be shown when ALL below conditions are fulfilled."
+          selector:
+            condition: {}
+
+    - type: expandable
+      name: subbutton4
+      title: "Subbutton 4"
+      icon: "mdi:list-box-outline"
+      schema:
+        - name: animation
+          label: "Animation"
+          selector:
+            select:
+              multiple: false
+              mode: dropdown
+              options:
+                - label: Spin
+                  value: "spin"
+                - label: Sound
+                  value: "sound"
+                - label: Roam
+                  value: "roam"
+                - label: Bounce
+                  value: "bounce"
+        - name: condition
+          label: "Annimation is always visible if no condition is defined. Otherwise, it will be shown when ALL below conditions are fulfilled."
+          selector:
+            condition: {}
+  code: |
+    .spin {
+      animation: slow-rotate 2s linear infinite;
+    }
+
+    .sound {
+      animation: sound 0.8s linear infinite;
+    }
+
+
+    .roam {
+      animation: roam 10s linear infinite;
+    }
+
+    .bounce {
+      animation: bounce 2s infinite 2s;
+    }
+
+
+    @keyframes slow-rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes sound {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.10); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes roam {
+      0% { transform: translate(0px, 5px) rotate(0deg); }
+      25% { transform: translate(-5px, 0px) rotate(-45deg); }
+      50% { transform: translate(0px, -5px) rotate(0deg); }
+      75% { transform: translate(5px, 0px) rotate(45deg); }
+      100% { transform: translate(0px, 5px) rotate(0deg); }
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      40% { transform: translateY(-8px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    ${(() => {
+        const config = this.config.subbutton_animations || {};
+
+        const hasAnimation = (subbuttonConfig) => {
+            if(subbuttonConfig?.animation) {
+              return true;
+            } else {
+              return false;
+            }
+        };
+
+        const addAnimation = (containerSelector, subbuttonConfig) => {
+          if(!hasAnimation) {
+            return;
+          }
+
+          const subbuttonIcon = card.querySelector(containerSelector);
+          if(!subbuttonConfig?.condition || (subbuttonConfig?.condition && checkConditionsMet([].concat(subbuttonConfig.condition), hass))) {
+            subbuttonIcon.classList.add(subbuttonConfig.animation);
+          } else {
+            subbuttonIcon.classList.remove(subbuttonConfig.animation);
+          }
+        };
+
+        Object.values(config).forEach((c, index) => {
+          let subbuttonNumber = Number(Object.keys(config)[index].replace("subbutton", ""))
+          addAnimation(`.bubble-sub-button-${subbuttonNumber} .bubble-sub-button-icon`, c);
+        });
+    })()}

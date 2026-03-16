@@ -1,0 +1,148 @@
+get_state_attribute:
+    name: "Advanced example: Get state/attribute from other entities"
+    version: "v1.3"
+    creator: "Clooos"
+    link: "https://github.com/Clooos/Bubble-Card/discussions/XXXX"
+
+    supported:
+        - pop-up
+        - cover
+        - button
+        - media-player
+        - climate
+        - select
+
+    description: |
+        Get state/attribute from other entities and replace the default state/attribute field.
+        <img class="example" src="https://github.com/Clooos/Bubble-Card/blob/main/img/get_state_template_example.png?raw=true" />
+        Configure this module via the editor or in YAML, for example:
+        <br><br>
+        <code-block><pre>
+        get_state_attribute:
+            - entity: weather.home
+            - entity: sensor.weather_station
+              attribute: humidity
+            - entity: sensor.weather_station
+              attribute: temperature
+        </pre></code-block>
+        <br>
+        <b>If it doesn't work, make sure at least one of "Show state" or "Show attribute" is turned on in your card configuration.</b>
+        
+        <br><br>
+        <code-block><pre>
+        get_state_attribute: 
+            # Your configuration here
+        </pre></code-block>
+
+    code: |
+        ${(() => {
+          // Retrieve the configuration or use an empty array by default
+          const config = this.config.get_state_attribute || [];
+        
+          // Format the retrieved value from the entity for each entry
+          const values = config
+            .map(cfg => {
+              const entity = hass.states[cfg.entity];
+              if (entity) {
+                let rawValue, formattedValue;
+        
+                if (cfg.attribute) {
+                  rawValue = entity.attributes[cfg.attribute];
+                  if (rawValue !== undefined && rawValue !== 'unknown' && rawValue !== 'unavailable' && rawValue !== 'null' && rawValue !== '') {
+                    formattedValue = hass.formatEntityAttributeValue(entity, cfg.attribute);
+                  }
+                } else {
+                  rawValue = entity.state;
+                  if (rawValue !== undefined && rawValue !== 'unknown' && rawValue !== 'unavailable' && rawValue !== 'null' && rawValue !== '') {
+                    formattedValue = hass.formatEntityState(entity);
+                  }
+                }
+        
+                if (formattedValue) {
+                  // Icona ridotta a 12px solo per queste bubble-icon
+                  const iconHtml = cfg.icon
+                    ? `<ha-icon icon="${cfg.icon}" style="--mdc-icon-size:13px;width:13px;height:13px;margin-right:3px;"></ha-icon>`
+                    : '';
+                  return `<span class="bubble-item">${iconHtml}<span class="bubble-text">${formattedValue}</span></span>`;
+                }
+              }
+              return null;
+            })
+            // Remove null values and empty strings or strings with only spaces
+            .filter(value => value !== null && value !== "" && value.trim() !== "");
+        
+          // Update the DOM element with icons + values separated by ' • '
+          card.querySelector('.bubble-state').innerHTML = values.join(' • ');
+        })()}
+        
+
+    editor:
+      - type: expandable
+        title: Select entities and attributes
+        icon: mdi:list-box-outline
+        schema:
+          - name: '0'
+            type: expandable
+            title: Entity 1
+            schema:
+              - name: entity
+                label: Entity
+                selector:
+                  entity: {}
+              - name: attribute
+                label: Attribute
+                selector:
+                  attribute: {}
+              - name: icon
+                label: Icon
+                selector:
+                  icon: {}
+          - name: '1'
+            type: expandable
+            title: Entity 2
+            schema:
+              - name: entity
+                label: Entity
+                selector:
+                  entity: {}
+              - name: attribute
+                label: Attribute
+                selector:
+                  attribute: {}
+              - name: icon
+                label: Icon
+                selector:
+                  icon: {}
+          - name: '2'
+            type: expandable
+            title: Entity 3
+            schema:
+              - name: entity
+                label: Entity
+                selector:
+                  entity: {}
+              - name: attribute
+                label: Attribute
+                selector:
+                  attribute: {}
+              - name: icon
+                label: Icon
+                selector:
+                  icon: {}
+          - name: '3'
+            type: expandable
+            title: Entity 4
+            schema:
+              - name: entity
+                label: Entity
+                selector:
+                  entity: {}
+              - name: attribute
+                label: Attribute
+                selector:
+                  attribute: {}
+              - name: icon
+                label: Icon
+                selector:
+                  icon: {}
+      

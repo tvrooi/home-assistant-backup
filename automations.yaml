@@ -1,0 +1,978 @@
+- id: '1769522262161'
+  alias: Wake-up lamp sunrise (Weekdays)
+  description: ''
+  triggers:
+  - value_template: '{% set h = states(''input_number.tristan_wake_hour'')|int(0)
+      %} {% set m = states(''input_number.tristan_wake_minute'')|int(0) %} {% set
+      wake = today_at("%02d:%02d:00" | format(h, m)) %} {{ now() >= (wake - timedelta(minutes=15))
+      and now() < (wake - timedelta(minutes=15) + timedelta(seconds=1)) }}
+
+      '
+    trigger: template
+  conditions:
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  actions:
+  - action: light.turn_on
+    target:
+      entity_id:
+      - light.tristan_bedroom_lights
+    data:
+      brightness_pct: 1
+  - delay: 00:00:02
+  - action: light.turn_on
+    data:
+      brightness_pct: 70
+      transition: 900
+    target:
+      entity_id: light.tristan_bedroom_lights
+  mode: single
+- alias: Front sprinkler - turn off when timer finishes
+  mode: single
+  trigger:
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.front_sprinkler
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.front_water_valve
+  id: 06b6cfc04bf74b4bb5f6b4e0a5784e6c
+- alias: Front sprinkler - cancel timer if valve turned off
+  mode: single
+  trigger:
+  - platform: state
+    entity_id: switch.front_water_valve
+    to: 'off'
+  action:
+  - service: timer.cancel
+    target:
+      entity_id: timer.front_sprinkler
+  id: 39c231f7f56849b1bc70035c06a0d872
+- id: '1771327852109'
+  alias: Dining Switch
+  description: ''
+  use_blueprint:
+    path: masanos1/Bilresa Z2M.yaml
+    input:
+      remote_device: 506f530320bdbf23af4594c4e7adf9c2
+      action_on:
+      - action: light.turn_on
+        target:
+          entity_id: light.dining_room_floor_lamp
+        data:
+          transition: 1
+          color_temp_kelvin: 2702
+          brightness_pct: 70
+      action_off:
+      - action: light.turn_off
+        target:
+          entity_id: light.dining_room_floor_lamp
+        data:
+          transition: 1
+      action_on_double:
+      - variables:
+          light_target: light.dining_room_floor_lamp
+          step_k: 200
+          trans: 0.7
+          cur_k: '{{ state_attr(light_target, ''color_temp_kelvin'') | int(2700) }}'
+          min_k: '{{ state_attr(light_target, ''min_color_temp_kelvin'') | int(2000)
+            }}'
+          max_k: '{{ state_attr(light_target, ''max_color_temp_kelvin'') | int(6500)
+            }}'
+          new_k: '{% set v = cur_k + step_k %} {% if v < min_k %}{{ min_k }} {% elif
+            v > max_k %}{{ max_k }} {% else %}{{ v }} {% endif %}'
+      - action: light.turn_on
+        target:
+          entity_id: '{{ light_target }}'
+        data:
+          transition: '{{ trans }}'
+          color_temp_kelvin: '{{ new_k }}'
+      action_off_double:
+      - variables:
+          light_target: light.dining_room_floor_lamp
+          step_k: 200
+          trans: 0.7
+          cur_k: '{{ state_attr(light_target, ''color_temp_kelvin'') | int(2700) }}'
+          min_k: '{{ state_attr(light_target, ''min_color_temp_kelvin'') | int(2000)
+            }}'
+          max_k: '{{ state_attr(light_target, ''max_color_temp_kelvin'') | int(6500)
+            }}'
+          new_k: '{% set v = cur_k - step_k %} {% if v < min_k %}{{ min_k }} {% elif
+            v > max_k %}{{ max_k }} {% else %}{{ v }} {% endif %}'
+      - action: light.turn_on
+        target:
+          entity_id: '{{ light_target }}'
+        data:
+          transition: '{{ trans }}'
+          color_temp_kelvin: '{{ new_k }}'
+      action_up:
+      - repeat:
+          while:
+          - condition: template
+            value_template: '{{ true }}'
+          sequence:
+          - action: light.turn_on
+            target:
+              entity_id: light.dining_room_floor_lamp
+            data:
+              brightness_step_pct: 2
+              transition: 0.35
+          - delay:
+              seconds: 0.35
+      action_down:
+      - repeat:
+          while:
+          - condition: template
+            value_template: '{{ true }}'
+          sequence:
+          - action: light.turn_on
+            target:
+              entity_id: light.dining_room_floor_lamp
+            data:
+              brightness_step_pct: -2
+              transition: 0.35
+          - delay:
+              seconds: 0.35
+      action_stop: []
+- id: '1771327911280'
+  alias: Backyard Switch
+  description: Physical switch control. Sets/clears manual-off latch so the door/sunset
+    automation respects manual intent.
+  use_blueprint:
+    path: masanos1/Bilresa Z2M.yaml
+    input:
+      remote_device: 8d8c1f32ffc6609c119d98f799d42ff1
+      action_on:
+      - action: light.turn_on
+        target:
+          entity_id: light.backyard_light
+        data:
+          transition: 1
+          color_temp_kelvin: 2702
+          brightness_pct: 70
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.backyard_light_manual_off
+      action_off:
+      - action: light.turn_off
+        target:
+          entity_id: light.backyard_light
+        data:
+          transition: 1
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.backyard_light_manual_off
+      action_on_double:
+      - variables:
+          light_target: light.backyard_light
+          step_k: 200
+          trans: 0.7
+          cur_k: '{{ state_attr(light_target, ''color_temp_kelvin'') | int(2700) }}'
+          min_k: '{{ state_attr(light_target, ''min_color_temp_kelvin'') | int(2000)
+            }}'
+          max_k: '{{ state_attr(light_target, ''max_color_temp_kelvin'') | int(6500)
+            }}'
+          new_k: '{% set v = cur_k + step_k %} {% if v < min_k %}{{ min_k }} {% elif
+            v > max_k %}{{ max_k }} {% else %}{{ v }} {% endif %}'
+      - action: light.turn_on
+        target:
+          entity_id: '{{ light_target }}'
+        data:
+          transition: '{{ trans }}'
+          color_temp_kelvin: '{{ new_k }}'
+      action_off_double:
+      - variables:
+          light_target: light.backyard_light
+          step_k: 200
+          trans: 0.7
+          cur_k: '{{ state_attr(light_target, ''color_temp_kelvin'') | int(2700) }}'
+          min_k: '{{ state_attr(light_target, ''min_color_temp_kelvin'') | int(2000)
+            }}'
+          max_k: '{{ state_attr(light_target, ''max_color_temp_kelvin'') | int(6500)
+            }}'
+          new_k: '{% set v = cur_k - step_k %} {% if v < min_k %}{{ min_k }} {% elif
+            v > max_k %}{{ max_k }} {% else %}{{ v }} {% endif %}'
+      - action: light.turn_on
+        target:
+          entity_id: '{{ light_target }}'
+        data:
+          transition: '{{ trans }}'
+          color_temp_kelvin: '{{ new_k }}'
+      action_up:
+      - repeat:
+          while:
+          - condition: template
+            value_template: '{{ true }}'
+          sequence:
+          - action: light.turn_on
+            target:
+              entity_id: light.backyard_light
+            data:
+              brightness_step_pct: 5
+              transition: 0.25
+          - delay:
+              seconds: 0.25
+      action_down:
+      - repeat:
+          while:
+          - condition: template
+            value_template: '{{ true }}'
+          sequence:
+          - action: light.turn_on
+            target:
+              entity_id: light.backyard_light
+            data:
+              brightness_step_pct: -5
+              transition: 0.25
+          - delay:
+              seconds: 0.25
+      action_stop: []
+- id: '1771327969677'
+  alias: Laundry light with door (only when dark)
+  description: ''
+  triggers:
+  - entity_id:
+    - binary_sensor.laundry_door_contact
+    to:
+    - 'on'
+    id: opened
+    trigger: state
+  - entity_id:
+    - binary_sensor.laundry_door_contact
+    to:
+    - 'off'
+    id: closed
+    trigger: state
+  conditions:
+  - condition: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    below: 5
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: opened
+      sequence:
+      - target:
+          entity_id: light.laundry_light
+        action: light.turn_on
+    - conditions:
+      - condition: trigger
+        id: closed
+      sequence:
+      - delay: 00:01:00
+      - target:
+          entity_id: light.laundry_light
+        action: light.turn_off
+  mode: restart
+- id: '1771328071946'
+  alias: Backyard light - door/sunset control
+  description: Auto-on when door opens or sun sets while door is open (respects manual-off
+    latch). Auto-off and reset latch when door closes.
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.backyard_door_contact
+    to: 'on'
+    id: door_opened
+  - platform: state
+    entity_id: binary_sensor.backyard_door_contact
+    to: 'off'
+    id: door_closed
+  - platform: state
+    entity_id: sun.sun
+    to: below_horizon
+    id: sun_set
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: door_opened
+      - condition: state
+        entity_id: sun.sun
+        state: below_horizon
+      - condition: state
+        entity_id: input_boolean.backyard_light_manual_off
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id: light.backyard_light
+        data:
+          brightness_pct: 100
+          transition: 0.5
+    - conditions:
+      - condition: trigger
+        id: sun_set
+      - condition: state
+        entity_id: binary_sensor.backyard_door_contact
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.backyard_light_manual_off
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id: light.backyard_light
+        data:
+          brightness_pct: 100
+          transition: 0.5
+    - conditions:
+      - condition: trigger
+        id: door_closed
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id: light.backyard_light
+        data:
+          transition: 0.5
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.backyard_light_manual_off
+  mode: restart
+- id: '1771334187123'
+  alias: 'Wake time: sliders → input_datetime'
+  description: ''
+  triggers:
+  - entity_id:
+    - input_number.tristan_wake_hour
+    - input_number.tristan_wake_minute
+    trigger: state
+  actions:
+  - target:
+      entity_id: input_datetime.tristan_wake_time
+    data:
+      time: '{% set h = states(''input_number.tristan_wake_hour'')|int(0) %} {% set
+        m = states(''input_number.tristan_wake_minute'')|int(0) %} {{ "%02d:%02d:00"
+        | format(h, m) }}
+
+        '
+    action: input_datetime.set_datetime
+  mode: single
+- id: '1771334205579'
+  alias: 'Wake time: input_datetime → sliders'
+  description: ''
+  triggers:
+  - event: start
+    trigger: homeassistant
+  - entity_id: input_datetime.tristan_wake_time
+    trigger: state
+  actions:
+  - variables:
+      t: '{{ states(''input_datetime.tristan_wake_time'') }}'
+      h: '{{ (t[0:2]|int(0)) if t|length >= 5 else 0 }}'
+      m: '{{ (t[3:5]|int(0)) if t|length >= 5 else 0 }}'
+      m5: '{{ (m // 5) * 5 }}'
+  - target:
+      entity_id: input_number.tristan_wake_hour
+    data:
+      value: '{{ h }}'
+    action: input_number.set_value
+  - target:
+      entity_id: input_number.tristan_wake_minute
+    data:
+      value: '{{ m5 }}'
+    action: input_number.set_value
+  mode: single
+- id: '1771400516309'
+  alias: Tristan Bedroom - Coordinate Adaptive Lighting vs Dynamic Scene
+  description: Turns Adaptive Lighting off when Dynamic Scene is enabled, and turns
+    it back on when Dynamic Scene is disabled.
+  triggers:
+  - entity_id: input_boolean.tristan_dynamic_scene
+    trigger: state
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.tristan_dynamic_scene
+        state: 'on'
+      sequence:
+      - target:
+          entity_id: switch.adaptive_lighting_tristan_bedroom
+        action: switch.turn_off
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.tristan_dynamic_scene
+        state: 'off'
+      sequence:
+      - target:
+          entity_id: switch.adaptive_lighting_tristan_bedroom
+        action: switch.turn_on
+  mode: single
+- id: '1771632870595'
+  alias: Bathroom Occupancy Smart Sensor
+  description: Latches occupied when motion detected with door closed. Ignores motion
+    clearing while door stays shut — only resets when door opens. On door close, waits
+    30s for motion before deciding unoccupied.
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.bathroom_door_contact
+    to: 'on'
+    id: door_opened
+  - platform: state
+    entity_id: binary_sensor.bathroom_door_contact
+    to: 'off'
+    id: door_closed
+  - platform: state
+    entity_id: binary_sensor.bathroom_occupancy_occupancy
+    to: 'on'
+    id: motion_detected
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: door_opened
+      sequence:
+      - target:
+          entity_id: input_boolean.bathroom_occupancy
+        action: input_boolean.turn_off
+    - conditions:
+      - condition: trigger
+        id: motion_detected
+      - condition: state
+        entity_id: binary_sensor.bathroom_door_contact
+        state: 'off'
+      sequence:
+      - target:
+          entity_id: input_boolean.bathroom_occupancy
+        action: input_boolean.turn_on
+    - conditions:
+      - condition: trigger
+        id: door_closed
+      sequence:
+      - wait_for_trigger:
+        - platform: state
+          entity_id: binary_sensor.bathroom_occupancy_occupancy
+          to: 'on'
+        timeout:
+          seconds: 30
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ wait.completed }}'
+          - condition: state
+            entity_id: binary_sensor.bathroom_door_contact
+            state: 'off'
+          sequence:
+          - target:
+              entity_id: input_boolean.bathroom_occupancy
+            action: input_boolean.turn_on
+        default:
+        - target:
+            entity_id: input_boolean.bathroom_occupancy
+          action: input_boolean.turn_off
+  mode: parallel
+  max: 5
+- id: '1772016799328'
+  alias: UI Graph Toggles - Auto Off (1 min)
+  description: ''
+  triggers:
+  - entity_id:
+    - input_boolean.show_living_temp_graph
+    - input_boolean.show_living_humidity_graph
+    to: 'on'
+    trigger: state
+  actions:
+  - delay: 00:01:00
+  - target:
+      entity_id:
+      - input_boolean.show_living_temp_graph
+      - input_boolean.show_living_humidity_graph
+    action: input_boolean.turn_off
+  mode: restart
+- id: '1772020436023'
+  alias: Hallway Switch
+  description: Physical remote for hallway pendant. ON pauses motion automation, OFF
+    resumes it.
+  use_blueprint:
+    path: EPMatt/philips_929002398602.yaml
+    input:
+      integration: Zigbee2MQTT
+      controller_device: 71124d2a6744423a50892e5f479d3166
+      helper_last_controller_event: input_text.hue_switch_last_event
+      action_button_on_short:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.hallway_pendant
+        data:
+          brightness_pct: 50
+      - action: automation.turn_off
+        target:
+          entity_id: automation.sensor_light_hallway
+        data:
+          stop_actions: true
+      action_button_off_short:
+      - action: light.turn_off
+        metadata: {}
+        target:
+          entity_id: light.hallway_pendant
+        data: {}
+      - action: automation.turn_on
+        target:
+          entity_id: automation.sensor_light_hallway
+        data: {}
+      button_on_long_loop: true
+      button_off_long_loop: true
+      action_button_off_long: []
+      action_button_up_short:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.hallway_pendant
+        data:
+          brightness_step_pct: 10
+      action_button_down_short:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.hallway_pendant
+        data:
+          brightness_step_pct: -10
+- id: '1772271688878'
+  alias: Front Door Open - Alert When Away
+  description: Notify if front door opens when nobody is home
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.front_door_contact
+    to: 'on'
+  conditions:
+  - condition: state
+    entity_id: group.all_devices_home
+    state: not_home
+  actions:
+  - data:
+      title: ⚠️ Front Door Alert
+      message: Front door opened while nobody is home!
+    action: notify.mobile_app_tristan_s_phone
+  - target:
+      entity_id: camera.front_door_doorbell
+    data:
+      filename: /tmp/front_door_alert.jpg
+    action: camera.snapshot
+  mode: single
+- id: '1772271698105'
+  alias: Front Sprinkler - Skip If Rain
+  description: Check rain in last 24h before allowing sprinkler activation
+  triggers:
+  - platform: state
+    entity_id:
+    - script.front_sprinkler_start
+    - script.front_sprinkler_start_5
+    - script.front_sprinkler_start_10
+    - script.front_sprinkler_start_15
+    - script.front_sprinkler_start_20
+    to: 'on'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ state_attr(''weather.home'', ''precipitation'') | float(0)
+          > 0 or state_attr(''weather.home'', ''humidity'') | float(0) > 90 }}'
+      sequence:
+      - data:
+          title: "\U0001F327️ Sprinkler Skipped"
+          message: Rain detected or humidity high - skipping watering
+        action: notify.mobile_app_tristan_s_phone
+      - action: script.front_sprinkler_stop
+  mode: single
+- id: '1772285874744'
+  alias: Auto-hide climate graphs
+  description: Turns off any climate graph boolean 2 minutes after it is toggled on
+  triggers:
+  - platform: state
+    entity_id:
+    - input_boolean.show_hallway_temp_graph
+    - input_boolean.show_hallway_humidity_graph
+    - input_boolean.show_living_temp_graph
+    - input_boolean.show_living_humidity_graph
+    - input_boolean.show_dining_temp_graph
+    - input_boolean.show_dining_humidity_graph
+    - input_boolean.show_bathroom_temp_graph
+    - input_boolean.show_bathroom_humidity_graph
+    - input_boolean.show_tristan_temp_graph
+    - input_boolean.show_tristan_humidity_graph
+    - input_boolean.show_zephyr_temp_graph
+    - input_boolean.show_zephyr_humidity_graph
+    - input_boolean.show_juno_temp_graph
+    - input_boolean.show_juno_humidity_graph
+    - input_boolean.show_laundry_temp_graph
+    - input_boolean.show_laundry_humidity_graph
+    to: 'on'
+  actions:
+  - delay: 00:02:00
+  - target:
+      entity_id: '{{ trigger.entity_id }}'
+    action: input_boolean.turn_off
+  mode: parallel
+  max: 20
+- id: '1772290117913'
+  alias: Tristan Slow Wake Alarm
+  description: Gradually increases Tristan's bedroom lights over 15 minutes as a slow
+    wake alarm
+  triggers:
+  - platform: time
+    at: input_datetime.tristan_wake_time
+  conditions:
+  - condition: state
+    entity_id: input_boolean.tristan_alarm_enabled
+    state: 'on'
+  actions:
+  - target:
+      entity_id: light.tristan_bedroom_lights
+    data:
+      brightness_pct: 1
+      color_temp: 370
+      transition: 2
+    action: light.turn_on
+  - delay:
+      seconds: 3
+  - target:
+      entity_id: light.tristan_bedroom_lights
+    data:
+      brightness_pct: 80
+      color_temp: 250
+      transition: 900
+    action: light.turn_on
+  mode: single
+- id: '1772290303646'
+  alias: Tristan Sleep Timer
+  description: ''
+  triggers: []
+  conditions: []
+  actions:
+  - target:
+      entity_id: media_player.tristans_wifi
+    data:
+      volume_level: 0.4
+    action: media_player.volume_set
+  - action: music_assistant.play_media
+    metadata: {}
+    target:
+      device_id: 523ba40ac1a2bfd4dac74edb3463c00d
+    data:
+      media_id: https://open.spotify.com/episode/5ZgzMwBk8gQyuJQAJyv8GB?si=KOJDUTPbQ6a6PHY0NMbfSw
+  - delay: 00:05:00
+  - target:
+      entity_id:
+      - light.tristan_left_bedside
+      - light.tristan_right_bedside
+      - light.tristan_desk_colour
+    data:
+      brightness_pct: 0
+      transition: 900
+    action: light.turn_on
+  - delay: 00:55:00
+  - target:
+      entity_id: media_player.tristans_wifi
+    action: media_player.media_stop
+  mode: single
+- id: '1772324210900'
+  alias: Washing Machine Occupancy Latch
+  description: Turns on the washing machine boolean when vibration is detected, keeps
+    it on until 20 minutes after the last vibration (handles quiet soak/fill phases
+    in a cycle)
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.washing_machine_in_use
+    to: 'on'
+  actions:
+  - target:
+      entity_id: input_boolean.washing_machine_in_use
+    action: input_boolean.turn_on
+  - wait_for_trigger:
+    - platform: state
+      entity_id: binary_sensor.washing_machine_in_use
+      to: 'on'
+    timeout:
+      minutes: 20
+  - target:
+      entity_id: input_boolean.washing_machine_in_use
+    action: input_boolean.turn_off
+  mode: restart
+- id: '1772325123109'
+  alias: Washing Machine Status Display
+  description: Updates the status text to show 'In Use' or 'Free' based on the latched
+    boolean state
+  triggers:
+  - platform: state
+    entity_id: input_boolean.washing_machine_in_use
+    to: 'on'
+    id: in_use
+  - platform: state
+    entity_id: input_boolean.washing_machine_in_use
+    to: 'off'
+    id: free
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: in_use
+      sequence:
+      - target:
+          entity_id: input_text.washing_machine_status
+        data:
+          value: In Use
+        action: input_text.set_value
+    - conditions:
+      - condition: trigger
+        id: free
+      sequence:
+      - target:
+          entity_id: input_text.washing_machine_status
+        data:
+          value: Free
+        action: input_text.set_value
+  mode: single
+- id: '1772351692511'
+  alias: Hallway Pendant App Override
+  description: 'When pendant is toggled via HA app: ON disables motion automation,
+    OFF re-enables it.'
+  triggers:
+  - platform: state
+    entity_id: light.hallway_pendant
+    to: 'on'
+    id: turned_on
+  - platform: state
+    entity_id: light.hallway_pendant
+    to: 'off'
+    id: turned_off
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.context.user_id is not none }}'
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: turned_on
+      sequence:
+      - action: automation.turn_off
+        target:
+          entity_id: automation.sensor_light_hallway
+    - conditions:
+      - condition: trigger
+        id: turned_off
+      sequence:
+      - action: automation.turn_on
+        target:
+          entity_id: automation.sensor_light_hallway
+  mode: single
+- id: '1772453264178'
+  alias: Living Room Orb Nightlight
+  description: Turns on the orb at low warm glow when motion detected between 23:00
+    and sunrise. Turns off 2 minutes after motion clears. Uses restart mode so new
+    motion resets the off-timer.
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.living_occupancy_occupancy
+    to: 'on'
+  conditions:
+  - condition: or
+    conditions:
+    - condition: time
+      after: '23:00:00'
+    - condition: sun
+      before: sunrise
+  actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.living_orb
+    data:
+      brightness_pct: 5
+      color_temp_kelvin: 2202
+  - wait_for_trigger:
+    - platform: state
+      entity_id: binary_sensor.living_occupancy_occupancy
+      to: 'off'
+      for:
+        minutes: 2
+    timeout:
+      hours: 1
+    continue_on_timeout: true
+  - action: light.turn_off
+    target:
+      entity_id: light.living_orb
+  mode: restart
+- id: '1772453280125'
+  alias: Living Room Orb App Override
+  description: When the orb is toggled via the HA app or UI (detected by user_id in
+    context), disable or re-enable the motion nightlight automation so manual control
+    persists.
+  triggers:
+  - platform: state
+    entity_id: light.living_orb
+    to: 'on'
+    id: turned_on
+  - platform: state
+    entity_id: light.living_orb
+    to: 'off'
+    id: turned_off
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.context.user_id is not none }}'
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: turned_on
+      sequence:
+      - action: automation.turn_off
+        target:
+          entity_id: automation.living_room_orb_nightlight
+    - conditions:
+      - condition: trigger
+        id: turned_off
+      sequence:
+      - action: automation.turn_on
+        target:
+          entity_id: automation.living_room_orb_nightlight
+  mode: single
+- id: '1772529143760'
+  alias: Sync Bedside Lamps - Left to Right
+  description: When left bedside brightness or color temp changes, sync to right bedside
+    (unless in color mode or scene is active)
+  triggers:
+  - platform: state
+    entity_id: light.tristan_left_bedside
+    attribute: brightness
+    id: brightness_change
+  - platform: state
+    entity_id: light.tristan_left_bedside
+    attribute: color_temp_kelvin
+    id: temp_change
+  conditions:
+  - condition: state
+    entity_id: light.tristan_left_bedside
+    state: 'on'
+  - condition: state
+    entity_id: light.tristan_right_bedside
+    state: 'on'
+  - condition: template
+    value_template: '{{ state_attr(''light.tristan_right_bedside'', ''color_mode'')
+      == ''color_temp'' }}'
+  - condition: state
+    entity_id: input_boolean.tristan_dynamic_scene
+    state: 'off'
+  actions:
+  - target:
+      entity_id: light.tristan_right_bedside
+    data:
+      brightness: '{{ state_attr(''light.tristan_left_bedside'', ''brightness'') }}'
+      color_temp_kelvin: '{{ state_attr(''light.tristan_left_bedside'', ''color_temp_kelvin'')
+        }}'
+    action: light.turn_on
+  mode: restart
+- id: '1772529155101'
+  alias: Sync Bedside Lamps - Right to Left
+  description: When right bedside brightness or color temp changes, sync to left bedside
+    (unless in color mode or scene is active)
+  triggers:
+  - platform: state
+    entity_id: light.tristan_right_bedside
+    attribute: brightness
+    id: brightness_change
+  - platform: state
+    entity_id: light.tristan_right_bedside
+    attribute: color_temp_kelvin
+    id: temp_change
+  conditions:
+  - condition: state
+    entity_id: light.tristan_left_bedside
+    state: 'on'
+  - condition: state
+    entity_id: light.tristan_right_bedside
+    state: 'on'
+  - condition: template
+    value_template: '{{ state_attr(''light.tristan_right_bedside'', ''color_mode'')
+      == ''color_temp'' }}'
+  - condition: state
+    entity_id: input_boolean.tristan_dynamic_scene
+    state: 'off'
+  actions:
+  - target:
+      entity_id: light.tristan_left_bedside
+    data:
+      brightness: '{{ state_attr(''light.tristan_right_bedside'', ''brightness'')
+        }}'
+      color_temp_kelvin: '{{ state_attr(''light.tristan_right_bedside'', ''color_temp_kelvin'')
+        }}'
+    action: light.turn_on
+  mode: restart
+- id: sensor_light_hallway
+  alias: Sensor Light Hallway (Nightlight 1% 11pm–sunrise)
+  description: Motion-activated hallway nightlight at 1% brightness, active from 11pm
+    until sunrise.
+  triggers:
+  - entity_id:
+    - binary_sensor.hallway_motion_presence
+    to:
+    - 'on'
+    trigger: state
+  conditions:
+  - condition: time
+    after: '23:00:00'
+  - condition: sun
+    before: sunrise
+  actions:
+  - data:
+      brightness_pct: 1
+    action: light.turn_on
+    target:
+      entity_id: light.hallway_pendant
+  - wait_for_trigger:
+    - entity_id: binary_sensor.hallway_motion
+      to: 'off'
+      for: 00:02:00
+      trigger: state
+  - action: light.turn_off
+    data: {}
+    target:
+      entity_id: light.hallway_pendant
+  mode: restart
+- id: '1772764849530'
+  alias: Washing Machine - Cycle Complete
+  description: Notify all users and announce to home when the washing machine cycle
+    finishes
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.laundry_washing_end_of_cycle
+    to: 'on'
+  actions:
+  - parallel:
+    - data:
+        title: "\U0001F9FA Washing Done"
+        message: The washing machine cycle has finished. Time to move the laundry!
+      action: notify.mobile_app_tristans_phone
+    - data:
+        title: "\U0001F9FA Washing Done"
+        message: The washing machine cycle has finished. Time to move the laundry!
+      action: notify.mobile_app_tristans_ipad
+    - data:
+        title: "\U0001F9FA Washing Done"
+        message: The washing machine cycle has finished. Time to move the laundry!
+      action: notify.mobile_app_juno_iphone
+    - data:
+        title: "\U0001F9FA Washing Done"
+        message: The washing machine cycle has finished. Time to move the laundry!
+      action: notify.mobile_app_zephyrs_iphone
+    - sequence:
+      - data:
+          entity_id:
+          - media_player.dining_room_wifi
+          - media_player.bathroom_google_mini
+          - media_player.tristans_wifi
+          - media_player.junos_room_speaker
+          message: Hey! The washing machine has finished its cycle. Please collect
+            your laundry.
+        action: tts.cloud_say
+  mode: single

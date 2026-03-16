@@ -1,0 +1,34 @@
+simple-popup-header:
+  name: Simple Pop-Up Header
+  version: '1.0'
+  creator: findingjohnny
+  link: https://github.com/Clooos/Bubble-Card/discussions/XXXX
+  supported:
+    - pop-up
+  description: |
+    A simplified pop-up header
+    <br><br>
+    <code-block><pre>
+    simple-popup-header: 
+        # Your configuration here
+    </pre></code-block>
+  code: |
+    .bubble-header {
+      .bubble-name {
+        font-size: var(--ha-font-size-xl) !important;
+        line-height: 22px !important;
+      }
+      .bubble-main-icon-container {
+        background-color: transparent !important;
+      }
+      .bubble-main-icon {
+        color: var(--secondary-text-color) !important;
+      }
+      .bubble-button-container {
+        background-color: transparent !important;
+      }
+      
+      .bubble-background {
+        background-color: transparent !important;
+      }
+    }

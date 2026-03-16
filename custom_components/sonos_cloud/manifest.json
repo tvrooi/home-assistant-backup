@@ -1,0 +1,16 @@
+{
+  "domain": "sonos_cloud",
+  "name": "Sonos Cloud",
+  "after_dependencies": ["media_source", "sonos"],
+  "codeowners": ["@jjlawren"],
+  "config_flow": true,
+  "dependencies": ["application_credentials"],
+  "documentation": "https://github.com/jjlawren/sonos_cloud/",
+  "homekit": {},
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/jjlawren/sonos_cloud/issues",
+  "requirements": [],
+  "ssdp": [],
+  "version": "0.3.6",
+  "zeroconf": []
+}

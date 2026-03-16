@@ -1,0 +1,308 @@
+color_temp_slider:
+    name: "Color Temp Slider"
+    version: "1.0"
+    creator: "ken-hacs-2025"
+    link: "https://github.com/Clooos/Bubble-Card/discussions/1823"
+
+    supported:
+        - button
+
+    description: |
+        This module extends a standard button card with a slider, adding color temperature control to an existing brightness slider.
+        Module Functions
+        Main Control: The card functions as a normal brightness slider for your light.
+        Toggle Button: A dedicated button next to the slider switches the slider's function to color temperature control.
+        Color Temperature Slider: Once toggled, the slider transforms into a custom bar for adjusting the color temperature.
+        In short, this module allows you to control both brightness and color temperature from a single, compact card.
+        You can configure the colors of the brightness and color temperature toggle button via the editor or in YAML.
+        <br><br>
+        <code-block><pre>
+        .bubble-buttons-container {
+          --bubble-sub-button-light-background-color: YOUR_VALUE;
+          --icon-primary-color: YOUR_VALUE;
+        }
+        </pre></code-block>
+
+    code: |
+        .bubble-background { background-color: transparent; }
+        .bubble-container { touch-action: none; position: relative; }
+        .colortemp-bar {
+          display: none;
+          opacity: 0.5 !important;
+          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          border-radius: inherit;
+          background: linear-gradient(to right, rgb(255,255,255), rgb(255,160,0));
+        }
+        .colortemp-indicator {
+          position: absolute; top: 5%; height: 90%;
+          width: 10px;
+          background: var(--primary-text-color,#000);
+          pointer-events: none;
+          left: -20px;
+          border-radius: 5px;
+          box-shadow: 0px 0px 3px rgba(0,0,0,0.4);
+          opacity: 0.5 !important;
+          transition: left 0.3s ease-out;
+        }
+        .colortemp-indicator::after {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 2px;
+          height: 20px;
+          background-color: #000;
+        }
+        .card-content.large .bubble-light-button {
+          width: 42px;
+          height: 42px;
+        }
+        .bubble-light-button {
+          pointer-events: auto;
+          position: relative;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          margin-right: 8px;
+          background-color: var(--bubble-sub-button-light-background-color, var(--bubble-accent-color, var(--bubble-default-color)));
+          color: var(--primary-text-color);
+        }
+        .bubble-light-button-icon {
+          --mdc-icon-size: 20px;
+          pointer-events: none;
+          icon: mdi:thermometer;
+        }
+        .card-content.large .bubble-light-button-icon {
+          --mdc-icon-size: 24px;
+        }
+        ${(() => {
+          const originalCallService = hass.callService;
+          hass.callService = (domain, service, data) => {
+            if (this._state?.isUserHolding && domain === "light" && data?.entity_id === this.config.entity) {
+              return;
+            }
+            return originalCallService.call(hass, domain, service, data);
+          };
+          const card = this;
+          const container = card.shadowRoot?.querySelector(".bubble-container");
+          const subButtonsContainer = card.shadowRoot?.querySelector(".bubble-buttons-container");
+          if (!container || !subButtonsContainer) return;
+          let state = card._state;
+          if (!state) {
+            state = {
+              mode: "brightness",
+              isUserHolding: false,
+              initialBrightness: null,
+              holdTimer: null
+            };
+            card._state = state;
+          }
+          let colortempBar = container.querySelector(".colortemp-bar");
+          if (!colortempBar) {
+            colortempBar = document.createElement("div");
+            colortempBar.className = "colortemp-bar";
+            container.prepend(colortempBar);
+          }
+          let colortempIndicator = container.querySelector(".colortemp-indicator");
+          if (!colortempIndicator) {
+            colortempIndicator = document.createElement("div");
+            colortempIndicator.className = "colortemp-indicator";
+            container.prepend(colortempIndicator);
+          }
+          let rangeSlider = container.querySelector(".range-slider");
+          if (!rangeSlider) return;
+          let lightButton = subButtonsContainer.querySelector(".bubble-light-button");
+          if (!lightButton) {
+            subButtonsContainer.innerHTML = '';
+            lightButton = document.createElement("div");
+            lightButton.className = "bubble-light-button";
+            const icon = document.createElement("ha-icon");
+            icon.className = "bubble-light-button-icon";
+            lightButton.appendChild(icon);
+            subButtonsContainer.appendChild(lightButton);
+          }
+          const icon = lightButton.querySelector("ha-icon");
+          const stopHandler = (ev) => ev.stopImmediatePropagation();
+          const updateUI = () => {
+            if (state.isUserHolding) return;
+            const entityState = hass.states[card.config.entity]?.state;
+            if (state.mode === 'brightness') {
+              if (icon) icon.setAttribute('icon', 'mdi:thermometer');
+              rangeSlider.style.display = 'flex';
+              colortempBar.style.display = 'none';
+              colortempIndicator.style.left = '-20px';
+              if (entityState === 'on') {
+                const fill = container.querySelector('.bubble-range-fill');
+                if (fill) {
+                  const fillColor = getComputedStyle(fill).backgroundColor;
+                  const rgbaMatch = fillColor.match(/rgba?\(([^)]+)\)/);
+                  if (rgbaMatch) {
+                    const [r, g, b] = rgbaMatch[1].split(',').map(x => parseInt(x));
+                    rangeSlider.style.backgroundColor = `rgba(${r},${g},${b},0.2)`;
+                  }
+                }
+              } else {
+                rangeSlider.style.backgroundColor = '';
+              }
+              if (rangeSlider && rangeSlider.dataset.disabledEvents) {
+                rangeSlider.removeEventListener("touchend", stopHandler, { capture: true });
+                rangeSlider.removeEventListener("pointerup", stopHandler, { capture: true });
+                delete rangeSlider.dataset.disabledEvents;
+              }
+            } else {
+              if (icon) icon.setAttribute('icon', 'mdi:brightness-4');
+              rangeSlider.style.display = 'none';
+              if (rangeSlider && !rangeSlider.dataset.disabledEvents) {
+                rangeSlider.addEventListener("touchend", stopHandler, { capture: true });
+                rangeSlider.addEventListener("pointerup", stopHandler, { capture: true });
+                rangeSlider.dataset.disabledEvents = 'true';
+              }
+              if (entityState === 'off') {
+                colortempBar.style.display = 'none';
+                if (!state.isUserHolding) colortempIndicator.style.left = '-20px';
+              } else {
+                colortempBar.style.display = 'flex';
+                if (!state.isUserHolding) {
+                  const { min_mireds: minCT = 153, max_mireds: maxCT = 500, color_temp: colorTemp = 153 } = hass.states[card.config.entity]?.attributes || {};
+                  const ratio = (colorTemp - minCT) / (maxCT - minCT);
+                  const haCard = card.shadowRoot?.querySelector("ha-card");
+                  if (!haCard) return;
+                  const haCardRect = haCard.getBoundingClientRect();
+                  const indicatorWidth = 10;
+                  const left = Math.max(0, Math.min(haCardRect.width - indicatorWidth, ratio * (haCardRect.width - indicatorWidth)));
+                  colortempIndicator.style.left = `${Math.round(left)}px`;
+                }
+              }
+            }
+          };
+          const cardContent = card.shadowRoot?.querySelector('.card-content');
+          if (cardContent?.classList.contains('large')) lightButton.classList.add('large');
+          else lightButton.classList.remove('large');
+          if (lightButton._clickHandler) {
+            lightButton.removeEventListener("click", lightButton._clickHandler);
+          }
+          const clickHandler = (e) => {
+            e.stopPropagation();
+            if (state.mode === "brightness") {
+              state.mode = "colortemp";
+            } else {
+              state.mode = "brightness";
+              const bubbleRangeFill = card.shadowRoot?.querySelector('.bubble-range-fill');
+              const NowPosition = bubbleRangeFill.style.transform;
+              bubbleRangeFill.style.transform = 'translateX(0%)';
+              bubbleRangeFill.style.transition = 'transform 0.3s ease-out';
+              setTimeout(() => {
+                bubbleRangeFill.style.transform = NowPosition;
+              }, 50 );
+            }
+            updateUI();
+          };
+          lightButton.addEventListener("click", clickHandler);
+          lightButton._clickHandler = clickHandler;
+          const calcIndicatorLeft = (clientX) => {
+            const haCard = card.shadowRoot?.querySelector("ha-card");
+            if (!haCard) return 0;
+            const haCardRect = haCard.getBoundingClientRect();
+            const indicatorWidth = 10;
+            let x = clientX - haCardRect.left;
+            return Math.max(0, Math.min(haCardRect.width - indicatorWidth, x - indicatorWidth/2));
+          };
+          const moveIndicator = (clientX) => {
+            const left = calcIndicatorLeft(clientX);
+            colortempIndicator.style.transition = 'none';
+            colortempIndicator.style.left = `${Math.round(left)}px`;
+          };
+          const calcColorTemp = (left) => {
+            const haCard = card.shadowRoot?.querySelector("ha-card");
+            const haCardRect = haCard?.getBoundingClientRect();
+            const indicatorWidth = 10;
+            const currentPercent = left / ((haCardRect?.width ?? 1) - indicatorWidth);
+            const minCT = hass.states[card.config.entity]?.attributes?.min_mireds ?? 153;
+            const maxCT = hass.states[card.config.entity]?.attributes?.max_mireds ?? 500;
+            return Math.round(minCT + currentPercent * (maxCT - minCT));
+          };
+          const startHold = (e) => {
+            if (state.mode !== 'colortemp') return;
+            if (e.type === 'mousedown' && e.button !== 0) return;
+            if (e.type === 'touchstart' && e.touches.length !== 1) return;
+            state.isUserHolding = true;
+            if (hass.states[card.config.entity]?.attributes?.brightness != null) {
+              state.initialBrightness = hass.states[card.config.entity].attributes.brightness;
+            }
+            const getX = ev => ev.clientX ?? ev.touches?.[0]?.clientX ?? ev.changedTouches?.[0]?.clientX;
+            const moveHandler = ev => {
+              if (!state.isUserHolding) return;
+              moveIndicator(getX(ev));
+              ev.preventDefault();
+              ev.stopPropagation();
+            };
+            const endHandler = async ev => {
+              if (!state.isUserHolding) return;
+              state.isUserHolding = false;
+              const finalX = getX(ev);
+              if (finalX == null) return;
+              const left = calcIndicatorLeft(finalX);
+              colortempIndicator.style.left = `${Math.round(left)}px`;
+              colortempIndicator.style.transition = 'left 0.3s ease-out';
+              const color_temp = calcColorTemp(left);
+              const brightness = state.initialBrightness ?? 150;
+              setTimeout(async () => {
+                try {
+                  await hass.callService("light", "turn_on", {
+                    entity_id: card.config.entity,
+                    color_temp,
+                    brightness
+                  });
+                } catch (error) {}
+              }, 100);
+              document.removeEventListener("mousemove", moveHandler, true);
+              document.removeEventListener("mouseup", endHandler, true);
+              document.removeEventListener("touchmove", moveHandler, true);
+              document.removeEventListener("touchend", endHandler, true);
+              document.removeEventListener("touchcancel", endHandler, true);
+              ev?.preventDefault();
+              ev?.stopPropagation();
+            };
+            moveIndicator(getX(e));
+            document.addEventListener("mousemove", moveHandler, true);
+            document.addEventListener("mouseup", endHandler, true);
+            document.addEventListener("touchmove", moveHandler, { passive: false, capture: true });
+            document.addEventListener("touchend", endHandler, { capture: true });
+            document.addEventListener("touchcancel", endHandler, { capture: true });
+          };
+          const handleHoldStart = (e) => {
+            if (state.mode !== 'colortemp') return;
+            if (e.type === 'mousedown' && e.button !== 0) return;
+            if (e.type === 'touchstart' && e.touches.length !== 1) return;
+            clearTimeout(state.holdTimer);
+            state.holdTimer = setTimeout(() => startHold(e), 300);
+          };
+          const handleHoldEnd = () => {
+            clearTimeout(state.holdTimer);
+          };
+          const existingListeners = container._customListeners;
+          if (existingListeners) {
+            container.removeEventListener("mousedown", existingListeners.mousedown);
+            container.removeEventListener("mouseup", existingListeners.mouseup);
+            container.removeEventListener("touchstart", existingListeners.touchstart);
+            container.removeEventListener("touchend", existingListeners.touchend);
+          }
+          const listeners = {
+            mousedown: handleHoldStart,
+            mouseup: handleHoldEnd,
+            touchstart: handleHoldStart,
+            touchend: handleHoldEnd
+          };
+          container._customListeners = listeners;
+          container.addEventListener("mousedown", listeners.mousedown);
+          container.addEventListener("mouseup", listeners.mouseup);
+          container.addEventListener("touchstart", listeners.touchstart, { passive: false });
+          container.addEventListener("touchend", listeners.touchend, { capture: true });
+          container.addEventListener("touchcancel", listeners.touchend, { capture: true });
+          updateUI();
+        })()}

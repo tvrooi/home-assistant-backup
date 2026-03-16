@@ -1,0 +1,302 @@
+blueprint:
+  name: Bilrea Scroll Controller V1.2
+  author: whag
+  description: 'Control Lights (Brightness, Temp, Color), Media, or Climate using
+    the Bilrea Smart Scrollwheel remote.
+
+    '
+  domain: automation
+  input:
+    mqtt_topic:
+      name: MQTT Topic
+      description: The full Zigbee2MQTT topic for your device (e.g., zigbee2mqtt/bedroom_knob).
+      default: zigbee2mqtt/FRIENDLY_NAME_HERE
+      selector:
+        text:
+          multiline: false
+          multiple: false
+    controlled_entity:
+      name: Entity to Control
+      description: The light, media player, or climate entity you wish to manage.
+      selector:
+        entity:
+          domain:
+          - light
+          - media_player
+          - climate
+          multiple: false
+          reorder: false
+    control_mode:
+      name: Control Mode
+      description: Select which attribute the rotation should adjust.
+      default: light_brightness
+      selector:
+        select:
+          options:
+          - label: Light - Brightness
+            value: light_brightness
+          - label: Light - Colour Temp
+            value: light_temp
+          - label: Light - Colour Wheel (RGB)
+            value: light_color
+          - label: Media Volume
+            value: media
+          - label: Climate Temperature
+            value: climate
+          sort: false
+          multiple: false
+          custom_value: false
+    step_brightness:
+      name: Brightness Step Percentage
+      description: Percentage change per click (1-100).
+      default: 10
+      selector:
+        number:
+          min: 1.0
+          max: 100.0
+          step: 1.0
+          unit_of_measurement: '%'
+          mode: slider
+    step_temp:
+      name: Colour Temp Step
+      description: Mireds to shift per click (e.g., 20). Lower is smoother.
+      default: 30
+      selector:
+        number:
+          min: 1.0
+          max: 100.0
+          step: 1.0
+          mode: slider
+    step_color:
+      name: Colour Hue Step
+      description: 'Degrees to rotate the colour wheel (1-360). Recommended: 5.'
+      default: 5
+      selector:
+        number:
+          min: 1.0
+          max: 360.0
+          step: 1.0
+          unit_of_measurement: °
+          mode: slider
+    step_media:
+      name: Volume Step Percentage
+      description: 'Volume change per click (0.01 to 0.1). Recommended: 0.05.'
+      default: 0.05
+      selector:
+        number:
+          min: 0.01
+          max: 0.2
+          step: 0.01
+          mode: slider
+    step_climate:
+      name: Temperature Step
+      description: Degrees Celsius to adjust per click (e.g., 0.5).
+      default: 0.5
+      selector:
+        number:
+          min: 0.1
+          max: 5.0
+          step: 0.1
+          unit_of_measurement: °C
+          mode: slider
+    session_timeout:
+      name: Session Timeout
+      description: Seconds to wait for the next turn before the command sequence ends.
+      default: 1
+      selector:
+        number:
+          min: 0.5
+          max: 5.0
+          step: 0.5
+          unit_of_measurement: s
+          mode: slider
+    action_single_on:
+      name: Single On
+      default: []
+      selector:
+        action: {}
+    action_single_off:
+      name: Single Off
+      default: []
+      selector:
+        action: {}
+    action_double_on:
+      name: Double On
+      default: []
+      selector:
+        action: {}
+    action_double_off:
+      name: Double Off
+      default: []
+      selector:
+        action: {}
+  source_url: https://github.com/willhaggan/Ikea-Bilresa-Remote-Z2M-Blueprint/blob/main/bilresa_scroll_controller_v1.yaml
+mode: single
+max_exceeded: silent
+trigger:
+- platform: mqtt
+  id: trig_on
+  topic: !input mqtt_topic
+  payload: 'on'
+  value_template: '{{ value_json.action }}'
+- platform: mqtt
+  id: trig_off
+  topic: !input mqtt_topic
+  payload: 'off'
+  value_template: '{{ value_json.action }}'
+- platform: mqtt
+  id: trig_on_double
+  topic: !input mqtt_topic
+  payload: on_double
+  value_template: '{{ value_json.action }}'
+- platform: mqtt
+  id: trig_off_double
+  topic: !input mqtt_topic
+  payload: off_double
+  value_template: '{{ value_json.action }}'
+- platform: mqtt
+  id: trig_scroll
+  topic: !input mqtt_topic
+  payload: brightness_move_to_level
+  value_template: '{{ value_json.action }}'
+variables:
+  target_entity: !input controlled_entity
+  mode: !input control_mode
+  s_bright: !input step_brightness
+  s_temp: !input step_temp
+  s_color: !input step_color
+  s_media: !input step_media
+  s_climate: !input step_climate
+action:
+- choose:
+  - conditions: '{{ trigger.id == ''trig_on'' }}'
+    sequence: !input action_single_on
+  - conditions: '{{ trigger.id == ''trig_off'' }}'
+    sequence: !input action_single_off
+  - conditions: '{{ trigger.id == ''trig_on_double'' }}'
+    sequence: !input action_double_on
+  - conditions: '{{ trigger.id == ''trig_off_double'' }}'
+    sequence: !input action_double_off
+  - conditions: '{{ trigger.id == ''trig_scroll'' }}'
+    sequence:
+    - variables:
+        start_val: '{{ 255 if trigger.payload_json.brightness is none else trigger.payload_json.brightness
+          | int }}'
+        new_action: brightness_move_to_level
+    - repeat:
+        while: '{{ new_action == ''brightness_move_to_level'' }}'
+        sequence:
+        - wait_for_trigger:
+          - platform: mqtt
+            id: 'on'
+            topic: !input mqtt_topic
+            payload: 'on'
+            value_template: '{{ value_json.action }}'
+          - platform: mqtt
+            id: 'off'
+            topic: !input mqtt_topic
+            payload: 'off'
+            value_template: '{{ value_json.action }}'
+          - platform: mqtt
+            id: on_double
+            topic: !input mqtt_topic
+            payload: on_double
+            value_template: '{{ value_json.action }}'
+          - platform: mqtt
+            id: off_double
+            topic: !input mqtt_topic
+            payload: off_double
+            value_template: '{{ value_json.action }}'
+          - platform: mqtt
+            id: scroll
+            topic: !input mqtt_topic
+            payload: brightness_move_to_level
+            value_template: '{{ value_json.action }}'
+          timeout:
+            seconds: !input session_timeout
+        - if:
+          - condition: template
+            value_template: '{{ wait.trigger is none }}'
+          then:
+          - stop: Session Timed Out
+          else:
+          - variables:
+              new_action: '{{ wait.trigger.payload_json.action }}'
+          - choose:
+            - conditions: '{{ wait.trigger.id in [''on'', ''off'', ''on_double'',
+                ''off_double''] }}'
+              sequence:
+              - choose:
+                - conditions: '{{ new_action == ''on'' }}'
+                  sequence: !input action_single_on
+                - conditions: '{{ new_action == ''off'' }}'
+                  sequence: !input action_single_off
+                - conditions: '{{ new_action == ''on_double'' }}'
+                  sequence: !input action_double_on
+                - conditions: '{{ new_action == ''off_double'' }}'
+                  sequence: !input action_double_off
+            - conditions: '{{ wait.trigger.id == ''scroll'' }}'
+              sequence:
+              - variables:
+                  raw_val: '{{ wait.trigger.payload_json.brightness }}'
+                  new_val: '{{ 255 if raw_val is none else raw_val | int }}'
+                  direction: '{% set delta = (new_val | int) - (start_val | int) %}
+                    {% if delta > 0 or new_val >= 255 %} 1 {% elif delta < 0 or new_val
+                    <= 1 %} -1 {% else %} 0 {% endif %}
+
+                    '
+              - if:
+                - condition: template
+                  value_template: '{{ direction != 0 }}'
+                then:
+                - choose:
+                  - conditions: '{{ mode == ''light_brightness'' }}'
+                    sequence:
+                    - service: light.turn_on
+                      target:
+                        entity_id: !input controlled_entity
+                      data:
+                        brightness_step_pct: '{{ s_bright * direction }}'
+                        transition: 0.1
+                  - conditions: '{{ mode == ''light_temp'' }}'
+                    sequence:
+                    - service: light.turn_on
+                      target:
+                        entity_id: !input controlled_entity
+                      data:
+                        color_temp: '{% set current = state_attr(target_entity, ''color_temp'')
+                          | int(370) %} {% set min_m = state_attr(target_entity, ''min_mireds'')
+                          | int(153) %} {% set max_m = state_attr(target_entity, ''max_mireds'')
+                          | int(500) %} {{ [min_m, [current - (s_temp * direction),
+                          max_m]|min]|max }}
+
+                          '
+                        transition: 0.1
+                  - conditions: '{{ mode == ''light_color'' }}'
+                    sequence:
+                    - service: light.turn_on
+                      target:
+                        entity_id: !input controlled_entity
+                      data:
+                        hs_color:
+                        - '{{ ( (state_attr(target_entity, ''hs_color'')[0] | default(0)
+                          | float) + (s_color * direction) ) % 360 }}'
+                        - '{{ (state_attr(target_entity, ''hs_color'')[1] | default(100)
+                          | float) }}'
+                        transition: 0.1
+                  - conditions: '{{ mode == ''media'' }}'
+                    sequence:
+                    - service: '{% if direction == 1 %} media_player.volume_up {%
+                        else %} media_player.volume_down {% endif %}
+
+                        '
+                      target:
+                        entity_id: !input controlled_entity
+                  - conditions: '{{ mode == ''climate'' }}'
+                    sequence:
+                    - service: climate.set_temperature
+                      target:
+                        entity_id: !input controlled_entity
+                      data:
+                        temperature: '{{ state_attr(target_entity, ''temperature'')
+                          | float(20) + (s_climate * direction) }}'

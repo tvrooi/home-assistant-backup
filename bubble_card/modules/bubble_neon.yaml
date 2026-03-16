@@ -1,0 +1,81 @@
+bubble_neon:
+  name: Bubble Neon
+  version: v1.0.0
+  creator: Clooos
+  description: Dynamic theme that automatically assigns unique vibrant colors to each Bubble Card, with gradients for a lively and modern appearance (Can be applied to all cards simultaneously).
+  code: |-
+    * {
+      --row-gap: 12px;
+      --ha-section-grid-column-gap: 12px;
+    }
+
+    :host {
+      --bc-pos: -10% 0%;
+      --bc-start: #6a11cb;
+      --bc-end: #2575fc;
+    }
+
+    :not(.bubble-separator, .bc-weather-card .bubble-content-container).bubble-content-container::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      border-radius: var(--bubble-border-radius, 28px);
+      background: radial-gradient(circle at var(--bc-pos), var(--bc-start) -40%, transparent 60%);
+    }
+
+    .bubble-main-icon { 
+      color: #fff !important; 
+      opacity: 1 !important;
+    }
+
+    .bubble-header-container { 
+      --bubble-secondary-background-color: transparent; 
+      background: transparent !important;
+    }
+
+    .bubble-header-container .background-off {
+      --bubble-sub-button-background-color: var(--bubble-button-main-background-color, var(--bubble-main-background-color, var(--background-color-2, var(--secondary-background-color))));
+    }
+
+    .bubble-main-icon-container { 
+      background: var(--bc-icon-bg, #5b7dff) !important; 
+    }
+
+    ${(() => {
+      const host = this.popUp || card;
+      if (!host) return '';
+
+      const seed = this?.config?.entity ?? this?.config?.name ?? 'default';
+      const cacheKey = `neon:${seed}`;
+      if (host.dataset.bcNeonKey === cacheKey) return '';
+      host.dataset.bcNeonKey = cacheKey;
+
+      let hash = 0;
+      for (let i = 0; i < seed.length; i++) {
+        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+        hash |= 0;
+      }
+
+      let hue = Math.abs(hash % 360);
+      const avoid = 20;
+      if (hue < avoid || hue > 360 - avoid) {
+        hue = (hue + 40) % 360;
+      }
+
+      const color = `hsl(${hue},68%,48%)`;
+      host.style.setProperty('--bc-start', color);
+      host.style.setProperty('--bc-end', color);
+      host.style.setProperty('--bc-icon-bg', color);
+
+      const body = document.querySelector("body");
+      
+      if (body) {
+        body.style.setProperty('--ha-section-grid-column-gap', '12px');
+        body.style.setProperty('--ha-section-grid-row-gap', '12px');
+      }
+      return '';
+    })()}
+  editor: []

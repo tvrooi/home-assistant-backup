@@ -1,0 +1,2169 @@
+sub_button_conditional_label_icon:
+    name: "Conditional Sub-Button Labels, Icons, & Colours"
+    version: "1.01"
+    creator: "mboltonnet"
+    link: "https://github.com/Clooos/Bubble-Card/discussions/XXXX"
+
+    supported:
+        - button
+        - separator
+
+    description: |
+        Define the appearance of each sub-button based on its on/off state.
+        Define the state using state of an Entity (simple) or a set of Conditions (advanced).
+        For each state, set the sub-button's label, icon, and colours. Colours include the label colour, icon colour, and button background colour.
+        
+        Note: Leave "Show name" enabled in your sub-button settings.
+        Caution: Vibe coded and provided "as is" without ongoing support.
+        
+        <br><br>
+        <code-block><pre>
+        sub_button_conditional_label_icon: 
+            defaults: YOUR_VALUE
+        </pre></code-block>
+
+    code: |
+        ${(() => {
+          const config = this.config.sub_button_conditional_label_icon || {};
+          const defaults = config.defaults || {};
+        
+          const INHERIT = "__inherit__";
+          const normaliseColour = (v) => (!v || v === INHERIT ? "" : v);
+        
+          const getSubbuttonEl = (buttonNumber) => {
+            let el = card.querySelector(`.bubble-sub-button-${buttonNumber}`);
+            if (el) return el;
+        
+            const all = Array.from(
+              card.querySelectorAll(".bubble-sub-button, [class*='bubble-sub-button-']")
+            );
+            const idx = Number(buttonNumber) - 1;
+            return all[idx] || null;
+          };
+        
+        
+          const flattenSubButtons = (subButtonConfig) => {
+            const out = [];
+        
+            const pushGroupContainer = (container) => {
+              if (!container) return;
+              if (Array.isArray(container)) {
+                container.forEach(pushGroupContainer);
+                return;
+              }
+              if (Array.isArray(container.group)) {
+                container.group.forEach((btn) => out.push(btn || {}));
+                return;
+              }
+              if (typeof container === "object") out.push(container);
+            };
+        
+            if (Array.isArray(subButtonConfig)) {
+              subButtonConfig.forEach((btn) => out.push(btn || {}));
+              return out;
+            }
+        
+            if (subButtonConfig && typeof subButtonConfig === "object") {
+              if (Array.isArray(subButtonConfig.main)) {
+                subButtonConfig.main.forEach(pushGroupContainer);
+              }
+              if (Array.isArray(subButtonConfig.bottom)) {
+                subButtonConfig.bottom.forEach(pushGroupContainer);
+              }
+            }
+        
+            return out;
+          };
+        
+          const getInheritedSubbuttonCfg = (buttonNumber) => {
+            const idx = Number(buttonNumber) - 1;
+            const flat = flattenSubButtons(this.config?.sub_button);
+            return flat?.[idx] || {};
+          };
+        
+          const isNameEnabled = (subCfg) => {
+            // Bubble Card may store this as show_name, showName, etc.
+            const show = subCfg?.show_name ?? subCfg?.showName;
+            if (show === false) return false;
+        
+            // If the UI treats blank name as "hide name", prevent module label too.
+            // (Safe: only blocks when explicitly set to empty string)
+            if (subCfg?.name === "") return false;
+        
+            return true;
+          };
+        
+        
+          const getInheritedEntityId = (buttonNumber) => {
+            const idx = Number(buttonNumber) - 1;
+            const flat = flattenSubButtons(this.config?.sub_button);
+            return flat?.[idx]?.entity || null;
+          };
+        
+          const isVisible = (el) => {
+            if (!el) return false;
+            if (el.hidden) return false;
+            const style = getComputedStyle(el);
+            if (style.display === "none" || style.visibility === "hidden") return false;
+            return el.offsetParent !== null;
+          };
+        
+          const getNameEl = (subbutton) => {
+            // Prefer more specific containers first (safer than [class*='name'])
+            const candidates = [
+              subbutton?.querySelector?.(".bubble-sub-button-name"),
+              subbutton?.querySelector?.(".name"),
+              subbutton?.querySelector?.("[class*='bubble-sub-button-name']"),
+              subbutton?.querySelector?.("[class*='name']"),
+            ].filter(Boolean);
+        
+            return candidates.find(isVisible) || null;
+          };
+        
+          const getIconEl = (subbutton) =>
+            subbutton?.querySelector?.("ha-icon, iron-icon, svg") || null;
+        
+          const setLabel = (subbutton, label, enabled = true) => {
+            if (!subbutton) return;
+            const nameEl = getNameEl(subbutton);
+            if (!nameEl) return;
+        
+            if (!enabled) {
+              // Prevent "sticky" injected labels when Show Name is off
+              nameEl.textContent = "";
+              return;
+            }
+        
+            if (typeof label === "string") nameEl.textContent = label;
+          };
+        
+          const setIcon = (subbutton, iconName) => {
+            if (!subbutton || !iconName) return;
+        
+            const oldIcon = getIconEl(subbutton);
+            if (!oldIcon) return;
+        
+            try {
+              if ("icon" in oldIcon) {
+                oldIcon.icon = iconName;
+                return;
+              }
+              oldIcon.setAttribute("icon", iconName);
+            } catch (e) {}
+          };
+        
+          const clearStyleProps = (el, props = []) => {
+            if (!el?.style) return;
+            props.forEach((p) => el.style.removeProperty(p));
+          };
+        
+          const applyTextColour = (el, colour) => {
+            if (!el?.style) return;
+            const c = normaliseColour(colour);
+            if (!c) {
+              clearStyleProps(el, ["--bubble-text-color", "color"]);
+              return;
+            }
+            el.style.setProperty("--bubble-text-color", c);
+            el.style.setProperty("color", c);
+          };
+        
+          const applyIconColour = (el, colour) => {
+            if (!el?.style) return;
+            const c = normaliseColour(colour);
+            if (!c) {
+              clearStyleProps(el, ["--bubble-icon-color", "color", "fill"]);
+              return;
+            }
+            el.style.setProperty("--bubble-icon-color", c);
+            el.style.setProperty("color", c);
+            el.style.setProperty("fill", c);
+          };
+        
+          const applyButtonBg = (el, colour) => {
+            if (!el?.style) return;
+            const c = normaliseColour(colour);
+            if (!c) {
+              clearStyleProps(el, ["--bubble-button-background", "--bubble-background-color", "background"]);
+              return;
+            }
+            // Likely Bubble vars (harmless if unused)
+            el.style.setProperty("--bubble-button-background", c);
+            el.style.setProperty("--bubble-background-color", c);
+            // Fallback
+            el.style.setProperty("background", c);
+          };
+        
+          const setLabelColour = (subbutton, colour, enabled = true) => {
+            const nameEl = getNameEl(subbutton);
+            if (!nameEl) return;
+        
+            if (!enabled) {
+              // Clear any label colour overrides when name is disabled
+              applyTextColour(nameEl, "__inherit__");
+              return;
+            }
+        
+            applyTextColour(nameEl, colour);
+          };
+        
+          const setIconColour = (subbutton, colour) => {
+            const iconEl = getIconEl(subbutton);
+            if (!iconEl) return;
+            applyIconColour(iconEl, colour);
+          };
+        
+          const setButtonColour = (subbutton, colour) => {
+            applyButtonBg(subbutton, colour);
+          };
+        
+          const isOn = (cfg, inheritedEntityId) => {
+            if (cfg?.condition) {
+              try {
+                return checkConditionsMet(
+                  Array.isArray(cfg.condition) ? cfg.condition : [cfg.condition],
+                  hass
+                );
+              } catch (e) {}
+            }
+        
+            const entityId = cfg?.entity || inheritedEntityId;
+            if (entityId) {
+              const st = hass?.states?.[entityId]?.state;
+              const target = (cfg?.state ?? "on");
+              return st === target;
+            }
+        
+            return false;
+          };
+        
+          const apply = (buttonNumber, cfg = {}) => {
+            const subbutton = getSubbuttonEl(buttonNumber);
+            if (!subbutton) return;
+        
+            const inheritedEntityId = getInheritedEntityId(buttonNumber);
+            const on = isOn(cfg, inheritedEntityId);
+        
+            const labelOn  = cfg?.label ?? defaults?.label ?? "";
+            const labelOff = cfg?.off_label ?? defaults?.off_label ?? "";
+        
+            const iconOn   = cfg?.icon ?? defaults?.icon ?? "";
+            const iconOff  = cfg?.off_icon ?? defaults?.off_icon ?? "";
+        
+            const labelColourOn  = cfg?.label_colour ?? defaults?.label_colour ?? INHERIT;
+            const labelColourOff = cfg?.off_label_colour ?? defaults?.off_label_colour ?? INHERIT;
+        
+            const iconColourOn   = cfg?.icon_colour ?? defaults?.icon_colour ?? INHERIT;
+            const iconColourOff  = cfg?.off_icon_colour ?? defaults?.off_icon_colour ?? INHERIT;
+        
+            const buttonColourOn  = cfg?.button_colour ?? defaults?.button_colour ?? INHERIT;
+            const buttonColourOff = cfg?.off_button_colour ?? defaults?.off_button_colour ?? INHERIT;
+        
+            setLabel(subbutton, on ? labelOn : labelOff);
+            setIcon(subbutton, on ? iconOn : iconOff);
+        
+            setLabelColour(subbutton, on ? labelColourOn : labelColourOff);
+            setIconColour(subbutton, on ? iconColourOn : iconColourOff);
+            setButtonColour(subbutton, on ? buttonColourOn : buttonColourOff);
+          };
+        
+          const flat = flattenSubButtons(this.config?.sub_button);
+          const count = flat?.length || 0;
+        
+          for (let i = 1; i <= count; i++) {
+            apply(String(i), config[`button_${i}`] || {});
+          }
+        
+        })()}
+        
+
+    editor:
+      - type: expandable
+        name: defaults
+        title: Defaults
+        icon: mdi:tune
+        schema:
+          - type: expandable
+            title: Appearance when On
+            icon: mdi:toggle-switch
+            schema:
+              - name: label
+                label: Label (On)
+                selector:
+                  text: {}
+              - name: icon
+                label: Icon (On)
+                selector:
+                  icon: {}
+              - type: expandable
+                title: Colours
+                schema:
+                  - name: label_colour
+                    label: Label Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: icon_colour
+                    label: Icon Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: button_colour
+                    label: Button Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+          - type: expandable
+            title: Appearance when Off
+            icon: mdi:toggle-switch-off
+            schema:
+              - name: off_label
+                label: Label (Off)
+                selector:
+                  text: {}
+              - name: off_icon
+                label: Icon (Off)
+                selector:
+                  icon: {}
+              - type: expandable
+                title: Colours
+                schema:
+                  - name: off_label_colour
+                    label: Label Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: off_icon_colour
+                    label: Icon Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: off_button_colour
+                    label: Button Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+      - type: expandable
+        name: button_1
+        title: Sub-Button 1
+        icon: mdi:numeric-1
+        schema:
+          - name: condition
+            label: >-
+              Conditions: Select one or more conditions that must be met to use the
+              'On' state, or use the Entity field
+            selector:
+              condition: {}
+          - name: entity
+            label: >-
+              Entity: Select an entity to use for the state (leave blank to use
+              sub-button entity)
+            selector:
+              entity: {}
+          - name: state
+            label: State to use for 'On' (optional)
+            selector:
+              text: {}
+          - type: expandable
+            title: Appearance when On
+            icon: mdi:toggle-switch
+            schema:
+              - name: label
+                label: Label (On)
+                selector:
+                  text: {}
+              - name: icon
+                label: Icon (On)
+                selector:
+                  icon: {}
+              - type: expandable
+                title: Colours
+                schema:
+                  - name: label_colour
+                    label: Label Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: icon_colour
+                    label: Icon Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: button_colour
+                    label: Button Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+          - type: expandable
+            title: Appearance when Off
+            icon: mdi:toggle-switch-off
+            schema:
+              - name: off_label
+                label: Label (Off)
+                selector:
+                  text: {}
+              - name: off_icon
+                label: Icon (Off)
+                selector:
+                  icon: {}
+              - type: expandable
+                title: Colours
+                schema:
+                  - name: off_label_colour
+                    label: Label Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: off_icon_colour
+                    label: Icon Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: off_button_colour
+                    label: Button Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+      - type: expandable
+        name: button_2
+        title: Sub-Button 2
+        icon: mdi:numeric-2
+        schema:
+          - name: condition
+            label: >-
+              Conditions: Select one or more conditions that must be met to use the
+              'On' state, or use the Entity field
+            selector:
+              condition: {}
+          - name: entity
+            label: >-
+              Entity: Select an entity to use for the state (leave blank to use
+              sub-button entity)
+            selector:
+              entity: {}
+          - name: state
+            label: State to use for 'On' (optional)
+            selector:
+              text: {}
+          - type: expandable
+            title: Appearance when On
+            icon: mdi:toggle-switch
+            schema:
+              - name: label
+                label: Label (On)
+                selector:
+                  text: {}
+              - name: icon
+                label: Icon (On)
+                selector:
+                  icon: {}
+              - type: expandable
+                title: Colours
+                schema:
+                  - name: label_colour
+                    label: Label Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: icon_colour
+                    label: Icon Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: button_colour
+                    label: Button Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+          - type: expandable
+            title: Appearance when Off
+            icon: mdi:toggle-switch-off
+            schema:
+              - name: off_label
+                label: Label (Off)
+                selector:
+                  text: {}
+              - name: off_icon
+                label: Icon (Off)
+                selector:
+                  icon: {}
+              - type: expandable
+                title: Colours
+                schema:
+                  - name: off_label_colour
+                    label: Label Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: off_icon_colour
+                    label: Icon Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: off_button_colour
+                    label: Button Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+      - type: expandable
+        name: button_3
+        title: Sub-Button 3
+        icon: mdi:numeric-3
+        schema:
+          - name: condition
+            label: >-
+              Conditions: Select one or more conditions that must be met to use the
+              'On' state, or use the Entity field
+            selector:
+              condition: {}
+          - name: entity
+            label: >-
+              Entity: Select an entity to use for the state (leave blank to use
+              sub-button entity)
+            selector:
+              entity: {}
+          - name: state
+            label: State to use for 'On' (optional)
+            selector:
+              text: {}
+          - type: expandable
+            title: Appearance when On
+            icon: mdi:toggle-switch
+            schema:
+              - name: label
+                label: Label (On)
+                selector:
+                  text: {}
+              - name: icon
+                label: Icon (On)
+                selector:
+                  icon: {}
+              - type: expandable
+                title: Colours
+                schema:
+                  - name: label_colour
+                    label: Label Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: icon_colour
+                    label: Icon Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: button_colour
+                    label: Button Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+          - type: expandable
+            title: Appearance when Off
+            icon: mdi:toggle-switch-off
+            schema:
+              - name: off_label
+                label: Label (Off)
+                selector:
+                  text: {}
+              - name: off_icon
+                label: Icon (Off)
+                selector:
+                  icon: {}
+              - type: expandable
+                title: Colours
+                schema:
+                  - name: off_label_colour
+                    label: Label Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: off_icon_colour
+                    label: Icon Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: off_button_colour
+                    label: Button Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+      - type: expandable
+        name: button_4
+        title: Sub-Button 4
+        icon: mdi:numeric-4
+        schema:
+          - name: condition
+            label: >-
+              Conditions: Select one or more conditions that must be met to use the
+              'On' state, or use the Entity field
+            selector:
+              condition: {}
+          - name: entity
+            label: >-
+              Entity: Select an entity to use for the state (leave blank to use
+              sub-button entity)
+            selector:
+              entity: {}
+          - name: state
+            label: State to use for 'On' (optional)
+            selector:
+              text: {}
+          - type: expandable
+            title: Appearance when On
+            icon: mdi:toggle-switch
+            schema:
+              - name: label
+                label: Label (On)
+                selector:
+                  text: {}
+              - name: icon
+                label: Icon (On)
+                selector:
+                  icon: {}
+              - type: expandable
+                title: Colours
+                schema:
+                  - name: label_colour
+                    label: Label Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: icon_colour
+                    label: Icon Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: button_colour
+                    label: Button Colour (On)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+          - type: expandable
+            title: Appearance when Off
+            icon: mdi:toggle-switch-off
+            schema:
+              - name: off_label
+                label: Label (Off)
+                selector:
+                  text: {}
+              - name: off_icon
+                label: Icon (Off)
+                selector:
+                  icon: {}
+              - type: expandable
+                title: Colours
+                schema:
+                  - name: off_label_colour
+                    label: Label Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: off_icon_colour
+                    label: Icon Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)
+                  - name: off_button_colour
+                    label: Button Colour (Off)
+                    selector:
+                      select:
+                        options:
+                          - label: Default (inherit)
+                            value: __inherit__
+                          - label: White
+                            value: white
+                          - label: Black
+                            value: black
+                          - label: Gray
+                            value: gray
+                          - label: Light Gray
+                            value: lightgray
+                          - label: Dark Gray
+                            value: darkgray
+                          - label: Red
+                            value: red
+                          - label: Green
+                            value: green
+                          - label: Blue
+                            value: blue
+                          - label: Orange
+                            value: orange
+                          - label: Yellow
+                            value: yellow
+                          - label: Purple
+                            value: purple
+                          - label: Pink
+                            value: pink
+                          - label: Teal
+                            value: teal
+                          - label: Cyan
+                            value: cyan
+                          - label: Lime
+                            value: lime
+                          - label: Indigo
+                            value: indigo
+                          - label: Gold
+                            value: gold
+                          - label: Theme - Primary
+                            value: var(--primary-color)
+                          - label: Theme - Accent
+                            value: var(--accent-color)
+                          - label: Theme - State Icon
+                            value: var(--state-icon-color)
+                          - label: Theme - State Icon (Active)
+                            value: var(--state-icon-active-color)
+                          - label: Theme - Primary Text
+                            value: var(--primary-text-color)
+                          - label: Theme - Secondary Text
+                            value: var(--secondary-text-color)
+                          - label: Theme - Disabled Text
+                            value: var(--disabled-text-color)

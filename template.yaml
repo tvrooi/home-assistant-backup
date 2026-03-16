@@ -1,0 +1,451 @@
+# Home Assistant Template Sensors
+# Cleaned up: 2026-02-28
+
+# =========================================================================
+# Media Tracking - Active Speaker Detection
+# =========================================================================
+- sensor:
+    - name: "Active Speaker"
+      unique_id: active_speaker
+      state: >
+        {% set speakers = [
+          'media_player.sonos',
+          'media_player.tristans_wifi',
+          'media_player.dining_room_wifi',
+          'media_player.tristans_google_mini',
+          'media_player.junos_room_speaker'
+        ] %}
+        {% for speaker in speakers %}
+          {% if states(speaker) == 'playing' %}
+            {{ speaker }}
+          {% endif %}
+        {% endfor %}
+        {% if states('media_player.sonos') not in ['off', 'idle', 'unavailable'] %}
+          media_player.sonos
+        {% elif states('media_player.tristans_wifi') not in ['off', 'idle', 'unavailable'] %}
+          media_player.tristans_wifi
+        {% else %}
+          media_player.sonos
+        {% endif %}
+      attributes:
+        media_title: >
+          {{ state_attr(states('sensor.active_speaker'), 'media_title') }}
+        media_artist: >
+          {{ state_attr(states('sensor.active_speaker'), 'media_artist') }}
+        media_album_name: >
+          {{ state_attr(states('sensor.active_speaker'), 'media_album_name') }}
+        entity_picture: >
+          {{ state_attr(states('sensor.active_speaker'), 'entity_picture') }}
+
+# =========================================================================
+# Media Tracking - Sonos
+# =========================================================================
+- sensor:
+    - name: "Sonos Media Position"
+      unique_id: sonos_media_position
+      state: >
+        {% set pos = state_attr('media_player.sonos', 'media_position') %}
+        {% if pos %}
+          {{ pos | timestamp_custom('%M:%S', false) }}
+        {% else %}
+          0:00
+        {% endif %}
+
+    - name: "Sonos Media Duration"
+      unique_id: sonos_media_duration
+      state: >
+        {% set dur = state_attr('media_player.sonos', 'media_duration') %}
+        {% if dur %}
+          {{ dur | timestamp_custom('%M:%S', false) }}
+        {% else %}
+          0:00
+        {% endif %}
+
+    - name: "Sonos Media Remaining"
+      unique_id: sonos_media_remaining
+      state: >
+        {% set pos = state_attr('media_player.sonos', 'media_position') %}
+        {% set dur = state_attr('media_player.sonos', 'media_duration') %}
+        {% if pos and dur %}
+          {% set remaining = dur - pos %}
+          {{ remaining | timestamp_custom('%M:%S', false) }}
+        {% else %}
+          0:00
+        {% endif %}
+
+# =========================================================================
+# Media Tracking - Tristan's WiFi Speaker
+# =========================================================================
+- sensor:
+    - name: "Tristan WiFi Media Position"
+      unique_id: tristan_wifi_media_position
+      state: >
+        {% set pos = state_attr('media_player.tristans_wifi', 'media_position') %}
+        {% if pos %}
+          {{ pos | timestamp_custom('%M:%S', false) }}
+        {% else %}
+          0:00
+        {% endif %}
+
+    - name: "Tristan WiFi Media Duration"
+      unique_id: tristan_wifi_media_duration
+      state: >
+        {% set dur = state_attr('media_player.tristans_wifi', 'media_duration') %}
+        {% if dur %}
+          {{ dur | timestamp_custom('%M:%S', false) }}
+        {% else %}
+          0:00
+        {% endif %}
+
+    - name: "Tristan WiFi Media Remaining"
+      unique_id: tristan_wifi_media_remaining
+      state: >
+        {% set pos = state_attr('media_player.tristans_wifi', 'media_position') %}
+        {% set dur = state_attr('media_player.tristans_wifi', 'media_duration') %}
+        {% if pos and dur %}
+          {% set remaining = dur - pos %}
+          {{ remaining | timestamp_custom('%M:%S', false) }}
+        {% else %}
+          0:00
+        {% endif %}
+
+# =========================================================================
+# Media Tracking - Dining Room WiFi Speaker
+# =========================================================================
+- sensor:
+    - name: "Dining WiFi Media Position"
+      unique_id: dining_wifi_media_position
+      state: >
+        {% set pos = state_attr('media_player.dining_room_wifi', 'media_position') %}
+        {% if pos %}
+          {{ pos | timestamp_custom('%M:%S', false) }}
+        {% else %}
+          0:00
+        {% endif %}
+
+    - name: "Dining WiFi Media Duration"
+      unique_id: dining_wifi_media_duration
+      state: >
+        {% set dur = state_attr('media_player.dining_room_wifi', 'media_duration') %}
+        {% if dur %}
+          {{ dur | timestamp_custom('%M:%S', false) }}
+        {% else %}
+          0:00
+        {% endif %}
+
+    - name: "Dining WiFi Media Remaining"
+      unique_id: dining_wifi_media_remaining
+      state: >
+        {% set pos = state_attr('media_player.dining_room_wifi', 'media_position') %}
+        {% set dur = state_attr('media_player.dining_room_wifi', 'media_duration') %}
+        {% if pos and dur %}
+          {% set remaining = dur - pos %}
+          {{ remaining | timestamp_custom('%M:%S', false) }}
+        {% else %}
+          0:00
+        {% endif %}
+
+# =========================================================================
+# Lighting Status
+# =========================================================================
+- sensor:
+    - name: "Lights On Count"
+      unique_id: lights_on_count
+      unit_of_measurement: lights
+      icon: mdi:lightbulb
+      state: >
+        {% set lights_on = state_attr('group.all_lights', 'entity_id')
+           | select('is_state', 'on') | list | count %}
+        {{ lights_on }}
+
+# =========================================================================
+# Sprinkler System
+# =========================================================================
+- sensor:
+    - name: "Front Sprinkler - Last Ran"
+      unique_id: front_sprinkler_last_ran
+      icon: mdi:calendar-clock
+      state: "{{ states('input_datetime.front_sprinkler_last_ran') }}"
+
+# =========================================================================
+# Bathroom Occupancy - Combined Door + Motion Detection
+# =========================================================================
+- binary_sensor:
+    - name: "Bathroom Occupancy Status"
+      unique_id: bathroom_occupancy_status
+      device_class: occupancy
+      icon: mdi:human
+      state: >
+        {% set door_closed = is_state('binary_sensor.bathroom_door_contact', 'on') %}
+        {% set occupancy_detected = is_state('binary_sensor.bathroom_occupancy_occupancy', 'on') %}
+        {{ door_closed and occupancy_detected }}
+      attributes:
+        door_status: >
+          {% if is_state('binary_sensor.bathroom_door_contact', 'on') %}
+            Closed
+          {% else %}
+            Open
+          {% endif %}
+        occupancy_detected: "{{ is_state('binary_sensor.bathroom_occupancy_occupancy', 'on') }}"
+        presence_status: >
+          {% set door_closed = is_state('binary_sensor.bathroom_door_contact', 'on') %}
+          {% set occupancy_detected = is_state('binary_sensor.bathroom_occupancy_occupancy', 'on') %}
+          {% if not door_closed %}
+            Open
+          {% elif door_closed and occupancy_detected %}
+            Occupied
+          {% else %}
+            Vacant
+          {% endif %}
+
+# =========================================================================
+# Washing Machine In-Use Status - Vibration Detection
+# =========================================================================
+- binary_sensor:
+    - name: "Washing Machine In Use"
+      unique_id: washing_machine_in_use_sensor
+      device_class: vibration
+      icon: mdi:washing-machine
+      state: "{{ is_state('binary_sensor.laundry_vibration_vibration', 'on') }}"
+      attributes:
+        vibration_status: >
+          {% if is_state('binary_sensor.laundry_vibration_vibration', 'on') %}
+            In Use
+          {% else %}
+            Free
+          {% endif %}
+
+# =========================================================================
+# Fan Control - Living Room, Dining Room & Zephyr's Room
+# =========================================================================
+- fan:
+    - name: "Living Room Fan"
+      unique_id: living_room_fan
+      state: >
+        {{ states('input_number.living_room_fan_speed')|int > 0 }}
+      percentage: >
+        {{ states('input_number.living_room_fan_speed')|int * 20 }}
+      turn_on:
+        - service: script.lr_fan_speed_1
+        - service: input_number.set_value
+          target:
+            entity_id: input_number.living_room_fan_speed
+          data:
+            value: 1
+      turn_off:
+        - service: script.lr_fan_off
+        - service: input_number.set_value
+          target:
+            entity_id: input_number.living_room_fan_speed
+          data:
+            value: 0
+      set_percentage:
+        - choose:
+            - conditions: "{{ percentage|int == 0 }}"
+              sequence:
+                - service: script.lr_fan_off
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.living_room_fan_speed
+                  data:
+                    value: 0
+            - conditions: "{{ percentage|int <= 20 }}"
+              sequence:
+                - service: script.lr_fan_speed_1
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.living_room_fan_speed
+                  data:
+                    value: 1
+            - conditions: "{{ percentage|int <= 40 }}"
+              sequence:
+                - service: script.lr_fan_speed_2
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.living_room_fan_speed
+                  data:
+                    value: 2
+            - conditions: "{{ percentage|int <= 60 }}"
+              sequence:
+                - service: script.lr_fan_speed_3
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.living_room_fan_speed
+                  data:
+                    value: 3
+            - conditions: "{{ percentage|int <= 80 }}"
+              sequence:
+                - service: script.lr_fan_speed_4
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.living_room_fan_speed
+                  data:
+                    value: 4
+          default:
+            - service: script.lr_fan_speed_5
+            - service: input_number.set_value
+              target:
+                entity_id: input_number.living_room_fan_speed
+              data:
+                value: 5
+
+    - name: "Dining Room Fan"
+      unique_id: dining_room_fan
+      state: >
+        {{ states('input_number.dining_room_fan_speed')|int > 0 }}
+      percentage: >
+        {{ states('input_number.dining_room_fan_speed')|int * 20 }}
+      turn_on:
+        - service: script.dr_fan_speed_1
+        - service: input_number.set_value
+          target:
+            entity_id: input_number.dining_room_fan_speed
+          data:
+            value: 1
+      turn_off:
+        - service: script.dr_fan_off
+        - service: input_number.set_value
+          target:
+            entity_id: input_number.dining_room_fan_speed
+          data:
+            value: 0
+      set_percentage:
+        - choose:
+            - conditions: "{{ percentage|int == 0 }}"
+              sequence:
+                - service: script.dr_fan_off
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.dining_room_fan_speed
+                  data:
+                    value: 0
+            - conditions: "{{ percentage|int <= 20 }}"
+              sequence:
+                - service: script.dr_fan_speed_1
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.dining_room_fan_speed
+                  data:
+                    value: 1
+            - conditions: "{{ percentage|int <= 40 }}"
+              sequence:
+                - service: script.dr_fan_speed_2
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.dining_room_fan_speed
+                  data:
+                    value: 2
+            - conditions: "{{ percentage|int <= 60 }}"
+              sequence:
+                - service: script.dr_fan_speed_3
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.dining_room_fan_speed
+                  data:
+                    value: 3
+            - conditions: "{{ percentage|int <= 80 }}"
+              sequence:
+                - service: script.dr_fan_speed_4
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.dining_room_fan_speed
+                  data:
+                    value: 4
+          default:
+            - service: script.dr_fan_speed_5
+            - service: input_number.set_value
+              target:
+                entity_id: input_number.dining_room_fan_speed
+              data:
+                value: 5
+
+    - name: "Zephyr's Room Fan"
+      unique_id: zephyr_room_fan
+      state: >
+        {{ states('input_number.zephyr_fan_speed')|int > 0 }}
+      percentage: >
+        {{ states('input_number.zephyr_fan_speed')|int * 20 }}
+      turn_on:
+        - service: script.zephyr_fan_speed_1
+        - service: input_number.set_value
+          target:
+            entity_id: input_number.zephyr_fan_speed
+          data:
+            value: 1
+      turn_off:
+        - service: script.zephyr_fan_power_off
+        - service: input_number.set_value
+          target:
+            entity_id: input_number.zephyr_fan_speed
+          data:
+            value: 0
+      set_percentage:
+        - choose:
+            - conditions: "{{ percentage|int == 0 }}"
+              sequence:
+                - service: script.zephyr_fan_power_off
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.zephyr_fan_speed
+                  data:
+                    value: 0
+            - conditions: "{{ percentage|int <= 20 }}"
+              sequence:
+                - service: script.zephyr_fan_speed_1
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.zephyr_fan_speed
+                  data:
+                    value: 1
+            - conditions: "{{ percentage|int <= 40 }}"
+              sequence:
+                - service: script.zephyr_fan_speed_2
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.zephyr_fan_speed
+                  data:
+                    value: 2
+            - conditions: "{{ percentage|int <= 60 }}"
+              sequence:
+                - service: script.zephyr_fan_speed_3
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.zephyr_fan_speed
+                  data:
+                    value: 3
+            - conditions: "{{ percentage|int <= 80 }}"
+              sequence:
+                - service: script.zephyr_fan_speed_4
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.zephyr_fan_speed
+                  data:
+                    value: 4
+          default:
+            - service: script.zephyr_fan_speed_5
+            - service: input_number.set_value
+              target:
+                entity_id: input_number.zephyr_fan_speed
+              data:
+                value: 5
+                
+                
+                
+                
+                
+# ============================================================================
+# Input Helpers - Are any lights currently on?
+# ============================================================================
+
+- binary_sensor:
+      - name: Any Lights On
+        unique_id: any_lights_on
+        icon: mdi:lightbulb-group
+        state: >
+          {{ states.light
+             | selectattr('state', 'eq', 'on')
+             | rejectattr('attributes.entity_id', 'defined')
+             | rejectattr('entity_id', 'is_hidden_entity')
+             | list
+             | count > 0 }}
+

@@ -1,0 +1,5 @@
+streams:
+  Front Door F59A10: homekit://192.168.86.110:21065?device_id=D9:73:C1:F5:9A:10&device_public=3f7df362ad7e9c2a976a17873f717ef65bb817c9f0bd8b73ae5ca8ae8f88534c&client_id=c2ec4400-65ab-1e1d-8613-537f7c8798cf&client_private=c7c959956ac1859380ac18e74c59718ae1d40b2af44b8fe53c8ff954f08d7a1d762a42be2b408d903921bc222e5f183f11cd638a053e3bd0b4e0952892c11e73
+
+  facing_front_door:
+    - rtsp://Cd5FjHbv2FCz09kY:Uj94xevm3hJdTpzu@192.168.86.118/live1

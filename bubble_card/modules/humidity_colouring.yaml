@@ -1,0 +1,108 @@
+humidity_colouring:
+  name: Humidity Colouring
+  version: v1.0
+  creator: Timmy
+  unsupported:
+    - horizontal-buttons-stack
+    - media-player
+  description: |
+    This module provides dynamic colour styling based on humidity levels.
+    It allows selecting sub-buttons (1-6) and the state display to reflect humidity values.
+
+    Required entity:
+    - A humidity sensor (mandatory)
+
+    Configure this module via the editor or in YAML, for example:
+
+    humidity_colouring:
+      humidity_sensor: sensor.kitchen_humidity
+      elements:
+        sub_buttons: [1, 3, 5]  # Apply to sub-buttons 1, 3, and 5
+        state_display: true      # Apply to state display element
+  code: |
+    ${(() => {
+      const humiditySensor = hass?.states[this.config?.humidity_colouring?.humidity_sensor];
+      const humidity = parseFloat(humiditySensor?.state || 0);
+      const elements = this.config?.humidity_colouring?.elements || {};
+
+      let color;
+      let icon = 'mdi:water-percent';
+      
+      // Determine the colour and icon based on humidity
+      if (humidity < 30) {
+        color = 'rgba(210,180,140,0.8)'; // Light Brown (very dry)
+        icon = 'mdi:water-percent-alert';
+      } else if (humidity < 40) {
+        color = 'rgba(222,184,135,0.8)'; // Burlywood (dry)
+      } else if (humidity <= 60) {
+        color = 'rgba(152,251,152,0.8)'; // Pale Green (optimal)
+      } else if (humidity < 70) {
+        color = 'rgba(173,216,230,0.8)'; // Light Blue (humid)
+      } else {
+        color = 'rgba(135,206,250,0.8)'; // Light Sky Blue (very humid)
+        icon = 'mdi:water-percent-alert';
+      }
+
+      // Apply colour and icon to selected sub-buttons
+      if (elements.sub_buttons) {
+        const subButtons = Array.isArray(elements.sub_buttons) ? elements.sub_buttons : [];
+        subButtons.forEach(num => {
+          if (num >= 1 && num <= 6) {
+            const subButton = card?.querySelector(`.bubble-sub-button-${num}`);
+            if (subButton) {
+              const iconElement = subButton.querySelector('ha-icon');
+              if (iconElement) {
+                iconElement.style.color = color;
+                iconElement.setAttribute('icon', icon);
+              }
+            }
+          }
+        });
+      }
+
+      // Apply colour to state display if enabled
+      if (elements.state_display) {
+        const stateElement = card?.querySelector('.bubble-state.state.display-state');
+        if (stateElement) {
+          stateElement.style.color = color;
+        }
+      }
+      return '';
+    })()}
+  editor:
+    - type: expandable
+      title: Entity Configuration
+      icon: mdi:cog
+      schema:
+        - name: humidity_sensor
+          label: Humidity Sensor (Required)
+          selector:
+            entity:
+              device_class: humidity
+          required: true
+        - name: elements
+          type: grid
+          schema:
+            - name: sub_buttons
+              label: Sub-buttons to Style
+              selector:
+                select:
+                  multiple: true
+                  options:
+                    - label: Sub-button 1
+                      value: 1
+                    - label: Sub-button 2
+                      value: 2
+                    - label: Sub-button 3
+                      value: 3
+                    - label: Sub-button 4
+                      value: 4
+                    - label: Sub-button 5
+                      value: 5
+                    - label: Sub-button 6
+                      value: 6
+            - name: state_display
+              label: Apply to State Display
+              selector:
+                boolean: {}
+  link: https://github.com/Clooos/Bubble-Card/discussions/1254

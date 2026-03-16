@@ -1,0 +1,218 @@
+version: 5
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://core-mosquitto:1883
+  user: mqtt-user
+  password: zigbee3
+serial:
+  baudrate: 115200
+  rtscts: false
+  port: >-
+    /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_607da75b0b22f01185b7648fb887153e-if00-port0
+  adapter: zstack
+advanced:
+  log_level: info
+  channel: 11
+  network_key:
+    - 234
+    - 107
+    - 42
+    - 158
+    - 157
+    - 175
+    - 116
+    - 110
+    - 71
+    - 208
+    - 17
+    - 24
+    - 199
+    - 255
+    - 118
+    - 156
+  pan_id: 8310
+  ext_pan_id:
+    - 22
+    - 67
+    - 63
+    - 166
+    - 66
+    - 27
+    - 4
+    - 23
+frontend:
+  enabled: true
+  port: 8099
+homeassistant:
+  enabled: true
+devices:
+  '0x00158d008c7c3f97':
+    friendly_name: tristan_door
+    homeassistant:
+      name: Tristan Bedroom Door Contact Sensor
+  '0xa4c138bb16ffdaad':
+    friendly_name: hallway_motion
+    homeassistant:
+      name: Hallway Motion Sensor
+  '0xc4d8c8fffe49bdd2':
+    friendly_name: Front Water Valve
+    disable_automatic_update_check: true
+  '0xa4c1385451a39d3c':
+    friendly_name: bathroom_door
+    homeassistant:
+      name: Bathroom Door Contact Sensor
+  '0xa4c1383a6aaf3761':
+    friendly_name: laundry_vibration
+    homeassistant:
+      name: Laundry Vibration Sensor
+  '0x180df9fffe0e58ec':
+    friendly_name: tristan_plug
+    homeassistant:
+      name: Tristan Bedroom Neutron Light
+  '0x20a716fffea47f07':
+    friendly_name: living_plug
+    homeassistant:
+      name: Living Room Plug
+  '0x20a716fffe4c3eb8':
+    friendly_name: dining_plug
+    homeassistant:
+      name: Dining Room Plug
+  '0xc09b9efffe0be1d2':
+    friendly_name: laundry_plug
+    homeassistant:
+      name: Laundry Plug
+  '0xbc8d7efffec29a5d':
+    friendly_name: laundry_light
+    homeassistant:
+      name: Laundry Light
+  '0xbc8d7efffeaee2b6':
+    friendly_name: backyard_light
+    homeassistant:
+      name: Backyard Light
+  '0xa4c138303ad6ffff':
+    friendly_name: living_climate
+    homeassistant:
+      name: Living Room Climate Sensor
+  '0xa4c138303ad2ffff':
+    friendly_name: bathroom_climate
+    homeassistant:
+      name: Bathroom Climate Sensor
+  '0x94a081fffe6ce7a7':
+    friendly_name: living_orb
+    homeassistant:
+      name: Living Room Orb Light
+  '0xa4c1383041abffff':
+    friendly_name: dining_climate
+    homeassistant:
+      name: Dining Room Climate Sensor
+  '0xa4c138304083ffff':
+    friendly_name: zephyr_climate
+    homeassistant:
+      name: Zephyr Bedroom Climate Sensor
+  '0xa4c138304f17ffff':
+    friendly_name: tristan_climate
+    retain: true
+    homeassistant:
+      name: Tristan Bedroom Climate Sensor
+  '0xa4c13891c62f96d2':
+    friendly_name: backyard_door
+    homeassistant:
+      name: Backyard Door Contact Sensor
+  '0xa4c138c47cdb6de3':
+    friendly_name: laundry_door
+    homeassistant:
+      name: Laundry Door Contact Sensor
+  '0xa4c138d5e2e5849b':
+    friendly_name: zephyr_door
+    homeassistant:
+      name: Zephyr Bedroom Door Contact Sensor
+  '0xa4c1384b7c526cf2':
+    friendly_name: juno_bedroom_door
+    homeassistant:
+      name: Juno Bedroom Door Contact Sensor
+  '0xa4c138303786ffff':
+    friendly_name: juno_climate
+    homeassistant:
+      name: Juno Bedroom Climate Sensor
+  '0xa4c138fbf5eab5f5':
+    friendly_name: bathroom_occupancy
+    homeassistant:
+      name: Bathroom Occupancy Sensor
+  '0xa4c1389bcbee127d':
+    friendly_name: plant_boston_fern
+    homeassistant:
+      name: Plant Sensor Boston Fern
+  '0xa4c1383507302be1':
+    friendly_name: tristan_window
+    homeassistant:
+      name: Tristan Bedroom Window Sensor
+  '0xa4c13858c92671d0':
+    friendly_name: plant_fiddle_leaf
+    homeassistant:
+      name: Plant Sensor Fiddle Leaf
+  '0x1035970000831bfe':
+    friendly_name: dining_switch
+    homeassistant:
+      name: Dining Room Light Switch
+  '0x103597000083874d':
+    friendly_name: backyard_switch
+    homeassistant:
+      name: Backyard Light Switch
+  '0x001788010d9383a1':
+    friendly_name: tristan_right_bedside
+    homeassistant:
+      name: Tristan Right Bedside
+  '0x0017880109082084':
+    friendly_name: hallway_pendant
+    homeassistant:
+      name: Hallway Pendant
+  '0x0017880108ec681b':
+    friendly_name: dragon
+    homeassistant:
+      name: Dragon Lamp
+  '0xc02cedfffe9b54d6':
+    friendly_name: dining_room_floor_lamp
+    homeassistant:
+      name: Dining Room Floor Lamp
+  '0x0017880103524a4e':
+    friendly_name: tristan_left_bedside
+    homeassistant:
+      name: Tristan Left Bedside
+  '0x8c73dafffe6a102c':
+    friendly_name: living_occupancy
+    homeassistant:
+      name: Living Room Occupancy
+  '0x58263afffe562e1a':
+    friendly_name: juno_room
+    homeassistant:
+      name: Juno Bedroom Light
+  '0x58263afffe625549':
+    friendly_name: zephyr_bedroom
+    homeassistant:
+      name: Zephyr Bedroom Desk Lamp
+  '0x001788010e2ac178':
+    friendly_name: hallway_switch
+    homeassistant:
+      name: Hallway Light Switch
+  '0xa4c1381258bfffff':
+    friendly_name: laundry_climate
+    homeassistant:
+      name: Laundry Climate Sensor
+  '0xa4c138232bcccdb5':
+    friendly_name: plant_kentia_palm
+  '0xa4c138845611b90d':
+    friendly_name: plant_snake
+    homeassistant:
+      name: Plant Sensor Snake Plant
+  '0xa4c138c028882f7d':
+    friendly_name: plant_elephant
+    homeassistant:
+      name: Plant Sensor Elephant
+  '0x001788010d3ff408':
+    friendly_name: tristan_desk_colour
+    homeassistant:
+      name: Tristan Bedroom Desk Colour
+  '0xa4c1380acab499de':
+    friendly_name: plant_syngonium_green
+availability:
+  enabled: true

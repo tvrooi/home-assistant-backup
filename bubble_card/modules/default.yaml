@@ -1,0 +1,25 @@
+default:
+  name: Default
+  version: ''
+  description: Empty and enabled by default. Add your custom styles and/or JS templates here to apply them to all cards by pressing the <ha-icon icon="mdi:pencil"></ha-icon> button above.
+  code: |2-
+        hide_backdrop: false
+        card_layout: large
+        bg_opacity: "88"
+        backdrop_blur: "0"
+        bg_blur: "10"
+        bg_color: ""
+        shadow_opacity: "0"
+        frosted_glass:
+          main_icon_color_boolean: icon_theme_color
+          icon_background: theme
+          border_radius: 32
+          blur: 32
+          shadow:
+            main_shadow_style: main_shadow_liquid
+            icon_shadow_style: icon_shadow_liquid
+            sub_shadow_style: sub_shadow_liquid
+          specific:
+            climate_light_effect: climate_bottom_position
+            dropdown_arrow: false
+  is_global: true

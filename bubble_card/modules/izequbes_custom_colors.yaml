@@ -1,0 +1,112 @@
+izequbes_custom_colors:
+    name: "IzeQubes Custom Colors"
+    version: "v1.1"
+    creator: "IzeQube"
+    link: "https://github.com/Clooos/Bubble-Card/discussions/XXXX"
+
+    supported:
+        - button
+        - calendar
+        - climate
+        - cover
+        - media-player
+        - pop-up
+        - select
+        - sub-buttons
+
+    description: |
+        Allows the user to change the accent color of the card with the standard Home Assistant predefined colors.
+        This change only effects the card if the entity is "turned on".
+        
+        The user can also override the icon color and background background of the icon container.
+        
+        Last but not least the user can change the opacity of both the card background color as the icon.
+        
+        <br><br>
+        <code-block><pre>
+        izequbes_custom_colors: 
+            main_icon: YOUR_VALUE
+        </pre></code-block>
+
+    code: |
+        ${(() => {
+          // Icon Color
+          let bubbleIcon = card.querySelector(".bubble-icon");
+          if(bubbleIcon && this.config.izequbes_custom_colors.main_icon) {
+            if(!!this.config.izequbes_custom_colors.main_icon.icon_opacity) {
+              bubbleIcon.style.opacity = this.config.izequbes_custom_colors.main_icon.icon_opacity;
+            }
+            if(!!this.config.izequbes_custom_colors.main_icon.icon_color) {
+              bubbleIcon.style.color = `var(--${this.config.izequbes_custom_colors.main_icon.icon_color}-color)`;
+            }
+          }
+        
+          // Icon Background
+          let bubbleIconContainer = card.querySelector(".bubble-icon-container");
+          if(bubbleIconContainer && this.config.izequbes_custom_colors.main_icon) {
+            if(!!this.config.izequbes_custom_colors.main_icon.background_color) {
+              bubbleIconContainer.style.background = `var(--${this.config.izequbes_custom_colors.main_icon.background_color}-color)`;
+            }
+          }
+        
+          // Card Color
+          if(this.config.izequbes_custom_colors.card) {
+            if(!!this.config.izequbes_custom_colors.card.background_color) {
+              card.style.setProperty('--bubble-button-accent-color', `var(--${this.config.izequbes_custom_colors.card.background_color}-color)`);
+              if(!!this.config.izequbes_custom_colors.card.always_apply) {
+                card.style.setProperty('--bubble-button-background-color', `var(--${this.config.izequbes_custom_colors.card.background_color}-color)`);
+              }
+            }
+            if(!!this.config.izequbes_custom_colors.card.opacity) {
+              card.querySelector(".bubble-button-background").style.opacity = this.config.izequbes_custom_colors.card.opacity;
+            }
+          }
+        
+        })()}
+        
+
+    editor:
+      - name: main_icon
+        type: expandable
+        title: Main Icon Color Settings
+        icon: mdi:list-box-outline
+        schema:
+          - type: string
+            name: background_color
+            label: Background Color
+            selector:
+              ui_color: {}
+          - name: icon_color
+            label: Icon Color
+            selector:
+              ui_color: {}
+          - name: icon_opacity
+            label: Icon Opacity
+            selector:
+              number:
+                min: 0
+                max: 1
+                step: 0.1
+                mode: slider
+      - name: card
+        type: expandable
+        title: Card Color Settings
+        icon: mdi:list-box-outline
+        schema:
+          - name: background_color
+            label: Background Color
+            selector:
+              ui_color:
+                include_none: true
+          - name: opacity
+            label: Opacity
+            selector:
+              number:
+                min: 0
+                max: 1
+                step: 0.1
+                mode: slider
+          - name: always_apply
+            label: Always Apply
+            selector:
+              boolean: null

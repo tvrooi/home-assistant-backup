@@ -1,0 +1,189 @@
+{
+  "title": "Plant monitor",
+  "entity": {
+    "sensor": {
+      "moisture": {
+        "name": "Soil moisture"
+      },
+      "temperature": {
+        "name": "Temperature"
+      },
+      "conductivity": {
+        "name": "Conductivity"
+      },
+      "illuminance": {
+        "name": "Illuminance"
+      },
+      "humidity": {
+        "name": "Air humidity"
+      },
+      "ppfd": {
+        "name": "PPFD"
+      },
+      "total_light_integral": {
+        "name": "Total light integral"
+      },
+      "daily_light_integral": {
+        "name": "Daily light integral"
+      }
+    },
+    "number": {
+      "max_moisture": {
+        "name": "Maximum soil moisture"
+      },
+      "min_moisture": {
+        "name": "Minimum soil moisture"
+      },
+      "max_temperature": {
+        "name": "Maximum temperature"
+      },
+      "min_temperature": {
+        "name": "Minimum temperature"
+      },
+      "max_illuminance": {
+        "name": "Maximum illuminance"
+      },
+      "min_illuminance": {
+        "name": "Minimum illuminance"
+      },
+      "max_dli": {
+        "name": "Maximum DLI"
+      },
+      "min_dli": {
+        "name": "Minimum DLI"
+      },
+      "max_conductivity": {
+        "name": "Maximum conductivity"
+      },
+      "min_conductivity": {
+        "name": "Minimum conductivity"
+      },
+      "max_humidity": {
+        "name": "Maximum air humidity"
+      },
+      "min_humidity": {
+        "name": "Minimum air humidity"
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure a plant",
+        "description": "Enter a name for your plant. Optionally enter a species to search OpenPlantbook.",
+        "data": {
+          "name": "Plant name",
+          "species": "Species"
+        },
+        "data_description": {
+          "species": "Will be used for searching OpenPlantbook"
+        }
+      },
+      "select_species": {
+        "title": "Select species from OpenPlantbook",
+        "description": "{desc}",
+        "data": {
+          "search_for": "Search for a different species",
+          "species": "Species"
+        },
+        "menu_options": {
+          "user": "Go back"
+        }
+      },
+      "sensors": {
+        "title": "Select sensors",
+        "description": "All sensors are optional. Sensors can also be added or changed later.",
+        "data": {
+          "temperature_sensor": "Temperature sensor",
+          "moisture_sensor": "Soil moisture sensor",
+          "conductivity_sensor": "Conductivity sensor",
+          "illuminance_sensor": "Illuminance sensor",
+          "humidity_sensor": "Air humidity sensor",
+          "co2_sensor": "CO2 sensor",
+          "soil_temperature_sensor": "Soil temperature sensor"
+        }
+      },
+      "limits": {
+        "title": "Set limits",
+        "description": "# {name}\n![Plant]({entity_picture}){br}\n{extra_desc}Temperature unit is {temperature_unit}",
+        "data": {
+          "right_plant": "This is the plant I was looking for",
+          "display_pid": "Plant species to display",
+          "max_moisture": "Maximum soil moisture (%)",
+          "min_moisture": "Minimum soil moisture (%)",
+          "max_illuminance": "Maximum illuminance (lx)",
+          "min_illuminance": "Minimum illuminance (lx)",
+          "max_dli": "Maximum DLI (mol/d⋅m²)",
+          "min_dli": "Minimum DLI (mol/d⋅m²)",
+          "max_temperature": "Maximum temperature (see above)",
+          "min_temperature": "Minimum temperature (see above)",
+          "max_conductivity": "Maximum conductivity (uS/cm)",
+          "min_conductivity": "Minimum conductivity (uS/cm)",
+          "max_humidity": "Maximum air humidity (%)",
+          "min_humidity": "Minimum air humidity (%)",
+          "entity_picture": "Image URL"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "description": "Configure options for **{plant_name}**",
+        "menu_options": {
+          "plant_properties": "Plant properties",
+          "replace_sensor": "Replace sensors"
+        }
+      },
+      "plant_properties": {
+        "title": "Plant properties",
+        "description": "Configure options for **{plant_name}**",
+        "data": {
+          "check_days": "Illuminance check days",
+          "species": "Species",
+          "force_update": "Force refresh data from OpenPlantbook",
+          "display_pid": "Plant species to display",
+          "entity_picture": "Image (URL, /local/ path, or media-source:// URL)",
+          "illuminance_trigger": "Use illuminance as problem trigger",
+          "dli_trigger": "Use daily light integral (dli) as problem trigger",
+          "humidity_trigger": "Use air humidity as problem trigger",
+          "conductivity_trigger": "Use conductivity as problem trigger",
+          "moisture_trigger": "Use soil moisture as problem trigger",
+          "temperature_trigger": "Use temperature as problem trigger",
+          "co2_trigger": "Use CO2 as problem trigger",
+          "soil_temperature_trigger": "Use soil temperature as problem trigger"
+        }
+      },
+      "replace_sensor": {
+        "title": "Replace sensors",
+        "description": "Replace external sensors for **{plant_name}**. Clear a field to remove that sensor.",
+        "data": {
+          "temperature_sensor": "Temperature sensor",
+          "moisture_sensor": "Soil moisture sensor",
+          "conductivity_sensor": "Conductivity sensor",
+          "illuminance_sensor": "Illuminance sensor",
+          "humidity_sensor": "Air humidity sensor",
+          "co2_sensor": "CO2 sensor",
+          "soil_temperature_sensor": "Soil temperature sensor"
+        }
+      }
+    }
+  },
+  "services": {
+    "replace_sensor": {
+      "name": "Replace sensor",
+      "description": "Replaces the source for a plant sensor.",
+      "fields": {
+        "meter_entity": {
+          "name": "Meter entity",
+          "description": "The meter entity, on the plant, to replace the sensor for."
+        },
+        "new_sensor": {
+          "name": "Sensor entity",
+          "description": "Entity id of the new sensor. Leave blank to remove sensor."
+        }
+      }
+    }
+  }
+}
